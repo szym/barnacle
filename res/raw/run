@@ -1,0 +1,25 @@
+#!/system/bin/sh
+# main runner (process manager) for barnacle, root required
+
+set -e
+
+# load the driver
+# NOTE: Android's shell is ash and there is no "test" or "["
+: ${brncl_lan_script:=wifi} 
+chmod 750 ./$brncl_lan_script
+./$brncl_lan_script load
+
+# ifconfig $brncl_if_lan $brncl_lan_gw netmask $brncl_lan_netmask up
+./wifi config 
+
+./dhcp & pid_dhcp=$!
+./nat & pid_nat=$!
+
+# the association loop
+./wifi assoc
+
+kill $pid_dhcp     2>/dev/null || true
+kill $pid_nat      2>/dev/null || true
+rm $brncl_nat_ctrl 2>/dev/null || true
+./wifi unload
+

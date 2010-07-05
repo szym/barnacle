@@ -1,0 +1,49 @@
+#!/system/bin/sh
+
+# an intermediate non-root shell script to configure the environment for ./run
+# TODO: this can probably be better done using ProcessBuilder.environment()
+
+set -e
+
+# configuration parameters: brncl_...
+# if_wan        REQUIRED
+# if_lan
+# lan_gw
+# lan_netmask
+# lan_essid
+# lan_bssid
+# lan_wep
+# lan_channel
+# lan_script
+# dhcp_dns1
+# dhcp_dns2
+# dhcp_leasetime
+# dhcp_firstname
+# dhcp_numhosts
+# nat_queue
+# nat_timeout
+# nat_timeout_tcp
+# nat_firstport
+# nat_numports
+# nat_log
+# nat_ctrl
+
+. ./brncl.ini
+
+# set defaults
+: ${brncl_lan_gw:="192.168.5.1"}
+: ${brncl_lan_netmask:="255.255.255.0"}
+: ${brncl_dhcp_dns1:="`getprop net.dns1`"}
+: ${brncl_dhcp_dns2:="`getprop net.dns2`"}
+: ${brncl_if_lan:="`getprop wifi.interface`"}
+
+export brncl_if_wan brncl_if_lan
+export brncl_lan_gw brncl_lan_netmask
+export brncl_lan_essid brncl_lan_bssid brncl_lan_wep brncl_lan_channel brncl_lan_script
+export brncl_dhcp_dns1 brncl_dhcp_dns2 brncl_dhcp_leasetime brncl_dhcp_firsthost brncl_dhcp_numhosts
+export brncl_nat_queue brncl_nat_timeout brncl_nat_timeout_tcp brncl_nat_firstport brncl_nat_numports
+export brncl_nat_log brncl_nat_ctrl
+
+chmod 750 wifi dhcp nat run
+exec su -c ${1:-./run}
+

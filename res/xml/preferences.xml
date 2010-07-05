@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory android:title="Wireless LAN">
+		<EditTextPreference android:title="SSID"
+			android:key="@string/lan_essid" android:defaultValue="barnacle"
+			android:singleLine="true" />
+		<net.szym.barnacle.MACPreference android:title="BSSID (Optional)"
+			android:key="@string/lan_bssid" android:singleLine="true" 
+			android:hint="unique MAC address" />
+        <net.szym.barnacle.WEPPreference android:title="Wireless Encryption" 
+            android:summary="Set WEP key (40-bit or 104-bit)"
+            android:key="@string/lan_wep" android:defaultValue="" />
+        <CheckBoxPreference android:title="Access Control"
+            android:summary="Restrict NAT to selected MAC addresses"
+            android:key="@string/nat_filter" />
+		<ListPreference android:title="Channel"
+			android:key="@string/lan_channel" android:defaultValue="1"
+			android:entries="@array/channel_names" android:entryValues="@array/channel_values" />
+        <ListPreference android:title="Custom Ad-hoc Setup"
+            android:key="@string/lan_script" android:defaultValue=""
+            android:entries="@array/script_names" android:entryValues="@array/script_values" />
+	</PreferenceCategory>
+    <PreferenceCategory android:title="Interfaces">
+        <EditTextPreference android:title="WAN"
+            android:key="@string/if_wan" android:defaultValue=""
+            android:singleLine="true" />
+        <EditTextPreference android:title="LAN"
+            android:key="@string/if_lan" android:defaultValue=""
+            android:singleLine="true" />
+    </PreferenceCategory>
+	<PreferenceCategory android:title="Advanced">
+		<PreferenceScreen android:title="DHCP" android:summary="LAN Host Configuration">
+	        <net.szym.barnacle.IPPreference android:title="Gateway"
+	            android:key="@string/lan_gw" android:defaultValue="192.168.5.1"
+	            android:singleLine="true" />
+	        <net.szym.barnacle.IPPreference android:title="Netmask"
+	            android:key="@string/lan_netmask" android:defaultValue="255.255.255.0"
+	            android:singleLine="true" />
+			<EditTextPreference android:title="First Host"
+				android:key="@string/dhcp_firsthost" android:defaultValue="100"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<EditTextPreference android:title="Number of Hosts"
+				android:key="@string/dhcp_numhosts" android:defaultValue="100"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<EditTextPreference android:title="Lease Time (seconds)"
+				android:key="@string/dhcp_leasetime" android:defaultValue="1200"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<net.szym.barnacle.IPPreference android:title="DNS 1 (optional)"
+				android:key="@string/dhcp_dns1" android:singleLine="true" />
+			<net.szym.barnacle.IPPreference android:title="DNS 2 (optional)"
+				android:key="@string/dhcp_dns2" android:singleLine="true" />
+		</PreferenceScreen>
+		<PreferenceScreen android:title="NAT" android:summary="Network Address Translation">
+			<EditTextPreference android:title="First Port"
+				android:key="@string/nat_firstport" android:defaultValue="32000"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<EditTextPreference android:title="Number of Ports"
+				android:key="@string/nat_numports" android:defaultValue="300"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<EditTextPreference android:title="Queue Length"
+				android:key="@string/nat_queue" android:defaultValue="100"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<EditTextPreference android:title="Timeout (seconds)"
+				android:key="@string/nat_timeout" android:defaultValue="30"
+				android:numeric="integer"
+				android:singleLine="true" />
+			<EditTextPreference android:title="Timeout TCP (seconds)"
+				android:key="@string/nat_timeout_tcp" android:defaultValue="90"
+				android:numeric="integer"
+				android:singleLine="true" />
+		</PreferenceScreen>
+    </PreferenceCategory>
+    <!-- 
+    <PreferenceCategory android:title="Fixes">
+        <CheckBoxPreference android:title="su workaround" android:key="su_is_buggy" android:defaultValue="false"
+            android:summaryOn="su requires multiple arguments" android:summaryOff="su takes one argument" />
+    </PreferenceCategory>
+     -->
+</PreferenceScreen>

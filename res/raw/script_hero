@@ -1,0 +1,24 @@
+#!/system/bin/sh
+set -e
+
+CHANNEL=${brncl_lan_channel:-1}
+SSID="$brncl_lan_essid"
+INIFILE=adhoc.ini
+MODULE=/system/lib/modules/wlan.ko
+
+cat > $INIFILE <<EOF
+WiFiAdhoc = 1
+dot11DesiredChannel = $CHANNEL
+dot11DesiredSSID = $SSID
+dot11DesiredBSSType = 0
+EOF
+
+cat /etc/wifi/tiwlan.ini >> $INIFILE
+
+echo "hero: Loading wifi driver..."
+insmod $MODULE
+
+echo "hero: Initializing driver..."
+wlan_loader -f /system/etc/wifi/Fw1251r1c.bin -e /proc/calibration -i $INIFILE
+
+ip route delete table gprs 2>/dev/null || echo "hero: no gprs table"

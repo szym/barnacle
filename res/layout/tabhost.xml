@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+            <!--  views go here -->
+
+            <TableLayout android:id="@+id/traffic" android:paddingTop="20sp"
+                android:gravity="center"
+			    android:layout_width="fill_parent" android:layout_height="wrap_content"
+			    android:stretchColumns="*" android:shrinkColumns="*">
+			    
+			    <TableRow android:layout_width="fill_parent" >
+			        <TextView android:textColor="#FFFFFFFF"
+			            android:layout_width="fill_parent" android:layout_height="wrap_content"
+			            android:layout_alignParentLeft="true" android:textSize="16sp"
+			            android:text="Download" android:gravity="center"
+			            android:textStyle="bold" />
+			        <TextView android:textColor="#FFFFFFFF"
+			            android:layout_width="fill_parent" android:layout_height="wrap_content"
+			            android:layout_alignParentRight="true" android:textSize="16sp"  
+			            android:text="Upload" android:gravity="center"
+			            android:textStyle="bold" />
+			    </TableRow>
+			    <TableRow android:layout_width="fill_parent">
+			        <TextView android:id="@+id/download" android:textColor="#FFa4c639"
+			            android:layout_width="fill_parent" android:layout_height="wrap_content"
+			            android:layout_alignParentLeft="true"
+			            android:textSize="30sp" android:gravity="center"
+			            android:textStyle="bold" android:text="---"/>
+			        <TextView android:id="@+id/upload" android:textColor="#FFf05414"
+			            android:layout_width="fill_parent" android:layout_height="wrap_content"
+			            android:layout_alignParentRight="true"
+			            android:textSize="30sp" android:gravity="center"
+			            android:textStyle="bold" android:text="---"/>
+			    </TableRow>
+			    <TableRow android:layout_width="fill_parent">
+			        <TextView android:id="@+id/download_rate" android:padding="2dp"
+			            android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
+			            android:layout_height="wrap_content" android:textSize="20sp"
+			            android:gravity="center"
+			            android:textStyle="bold" />
+			        <TextView android:id="@+id/upload_rate" android:padding="2dp"
+			            android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
+			            android:layout_height="wrap_content" android:textSize="20sp"
+			            android:gravity="center"
+			            android:textStyle="bold" />
+			    </TableRow>
+			</TableLayout> 
+            
+            
+            <ScrollView android:id="@+id/logview"
+			    android:layout_width="fill_parent" android:layout_height="wrap_content">
+			    <TextView android:id="@+id/log_text"
+			        android:layout_width="fill_parent" android:layout_height="wrap_content"
+			        android:scrollHorizontally="false" android:gravity="top|left" />
+			</ScrollView>
+
+        </FrameLayout>
+    </LinearLayout>
+</TabHost>

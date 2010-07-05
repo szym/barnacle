@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<include layout="@layout/control" android:id="@+id/control" 
+	    android:layout_width="fill_parent" android:layout_height="180sp"
+	    android:layout_alignParentTop="true"/>
+	<include layout="@layout/tabhost" android:id="@android:id/tabhost" 
+	    android:layout_width="fill_parent" android:layout_height="fill_parent"
+	    android:layout_below="@id/control" android:layout_alignParentBottom="true"/>
+</RelativeLayout>

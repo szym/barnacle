@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Barnacle Wifi Tether</string>
+    <string name="clientview">Barnacle Clients</string>
+    <string name="notify_running">Sharing your connection</string>
+    <string name="notify_client">Client connected</string>
+    <string name="notify_error">Error occured</string>
+    
+    <string name="announce">Associate</string>
+
+
+	<string name="if_wan">if_wan</string>
+	<string name="if_lan">if_lan</string>
+	<string name="nat_queue">nat_queue</string>
+	<string name="nat_timeout">nat_timeout</string>
+	<string name="nat_timeout_tcp">nat_timeout_tcp</string>
+	<string name="nat_numports">nat_numports</string>
+	<string name="nat_firstport">nat_firstport</string>
+	<string name="dhcp_numhosts">dhcp_numhosts</string>
+	<string name="dhcp_firsthost">dhcp_firsthost</string>
+	<string name="dhcp_leasetime">dhcp_leasetime</string>
+	<string name="dhcp_dns1">dhcp_dns1</string>
+	<string name="dhcp_dns2">dhcp_dns2</string>
+	<string name="lan_netmask">lan_netmask</string>
+	<string name="lan_gw">lan_gw</string>
+	<string name="lan_essid">lan_essid</string>
+	<string name="lan_bssid">lan_bssid</string>
+	<string name="lan_channel">lan_channel</string>
+	<string name="lan_wep">lan_wep</string>
+	
+    <string name="nat_filter">nat_filter</string>
+    <string name="nat_ctrl">nat_ctrl</string>
+    <string name="lan_script">lan_script</string>
+
+    <string-array name="channel_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+<!--    <item>14</item> -->
+    </string-array>
+    <string-array name="channel_names">
+        <item>1 - 2412 MHz</item>
+        <item>2 - 2417 MHz</item>
+        <item>3 - 2422 MHz</item>
+        <item>4 - 2427 MHz</item>
+        <item>5 - 2432 MHz</item>
+        <item>6 - 2437 MHz</item>
+        <item>7 - 2442 MHz</item>
+        <item>8 - 2447 MHz</item>
+        <item>9 - 2452 MHz</item>
+        <item>10 - 2457 MHz</item>
+        <item>11 - 2462 MHz</item>
+        <item>12 - 2467 MHz</item>
+        <item>13 - 2472 MHz</item>
+<!--    <item>14 - 2484 MHz</item> -->
+    </string-array>
+
+    <integer-array name="script_ids">
+       <item>-1</item>
+       <item>@raw/script_hero</item> <!-- THIS WORKS! YAY! -->
+       <item>@raw/script_samsung</item> <!-- THIS WORKS! YAY! -->
+    </integer-array>
+	<string-array name="script_values">
+        <item></item>
+		<item>hero</item>
+		<item>samsung</item>
+	</string-array>
+	<string-array name="script_names">
+	    <item>none</item>
+		<item>Hero/Eris</item>
+		<item>Samsung</item>
+	</string-array>
+	
+	<string-array name="wep_type">
+	   <item>ASCII</item>
+	   <item>Hex</item>
+	</string-array>
+
+	<string name="websiteUrl">http://szym.net/barnacle/</string>
+	<string name="fixUrl">http://szym.net/projects/barnacle/fix.html</string>
+	<string name="rootUrl">http://szym.net/projects/barnacle/#root</string>
+	<string name="paypalUrl">https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=U3GSAVQDS3UK6&amp;lc=US&amp;item_name=szym%2enet&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted</string>
+
+</resources>

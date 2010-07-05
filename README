@@ -1,0 +1,31 @@
+Barnacle Wifi Tether
+====================
+
+Barnacle is a combination of tools to provide wifi tethering 
+on an Android phone:
+ * NAT
+ * DHCP server
+ * WLAN ad-hoc setup
+
+How to build Barnacle
+---------------------
+
+Prerequisites:                                                                                                                                                                                                       
+1) Android NDK r4 or above                                                                                                                                                                                           
+2) Eclipse and ADT plugin                                                                                                                                                                                            
+                                                                                                                                                                                                                     
+To build native components enter barnacle root directory and run                                                                                                                                                     
+$NDK/ndk-build                                                                                                                                                                                                       
+                                                                                                                                                                                                                     
+where NDK=path-to-your-ndk-directory                                                                                                                                                                                 
+                                                                                                                                                                                                                     
+To build the Android app import the existing project into Eclipse and export                                                                                                                                         
+an .apk file.
+
+Questions?
+----------
+
+For more information see: http://szym.net/barnacle/ 
+or e-mail: barnacle@szym.net
+
+

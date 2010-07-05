@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content" 
+	android:layout_width="fill_parent"
+	android:padding="8sp"
+    android:background="@drawable/row_background"
+	android:gravity="fill">
+		<TableLayout android:id="@+id/table"
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content"
+			android:gravity="fill">
+			<TableRow android:layout_width="fill_parent" android:padding="1sp">
+				<TextView
+					android:text="MAC Address: "
+			    	android:textStyle="bold"
+					android:textSize="14sp"/>
+			    <TextView android:id="@+id/macaddress"
+			    	android:layout_width="fill_parent"
+			    	android:textStyle="bold"
+					android:textColor="#FFFFFFFF"
+					android:paddingLeft="5px" android:textSize="18sp"/>
+			</TableRow>
+			<TableRow android:layout_width="fill_parent" android:padding="1sp">
+				<TextView
+					android:text="IP Address: "
+			    	android:textStyle="bold"
+					android:textSize="14sp"/>
+     				<TextView android:id="@+id/ipaddress"
+     					android:layout_width="fill_parent"
+			    	android:textStyle="bold"
+			    	android:textColor="#FFFFFFFF"
+					android:paddingLeft="5px" android:textSize="18sp"/>	
+			</TableRow>
+               <TableRow android:layout_width="fill_parent" android:padding="1sp">
+                   <TextView
+                       android:text="Hostname: "
+                       android:textStyle="bold"
+                       android:textSize="14sp"/>
+                   <TextView android:id="@+id/hostname"
+                       android:layout_width="fill_parent"
+                       android:textStyle="bold"
+                       android:textColor="#FFFFFFFF"
+                       android:paddingLeft="5px" android:textSize="18sp"/> 
+               </TableRow>
+		</TableLayout>
+	    <CheckBox android:id="@+id/allowed" 
+	              android:layout_width="wrap_content" 
+	              android:layout_height="wrap_content"
+	              android:layout_alignParentRight="true"
+	              android:layout_centerVertical="true"/>
+</RelativeLayout>
+

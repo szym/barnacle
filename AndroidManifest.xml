@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="net.szym.barnacle" android:versionCode="21"
+	android:versionName="0.5">
+	<application android:label="@string/app_name" android:icon="@drawable/barnacle_head"
+		android:name="BarnacleApp" android:description="@string/app_name">
+		<activity android:launchMode="singleTask" android:name="StatusActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity android:launchMode="singleTop" android:name="ClientsActivity"></activity>
+		<activity android:launchMode="singleTop" android:name="SettingsActivity"></activity>
+		<service android:label="Barnacle Wifi Tether" android:icon="@drawable/barnacle_head"
+			android:name="BarnacleService">
+		</service>
+	</application>
+
+	<uses-sdk android:targetSdkVersion="6" android:minSdkVersion="3" />
+
+	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+</manifest> 
