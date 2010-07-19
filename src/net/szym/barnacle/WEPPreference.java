@@ -57,6 +57,14 @@ public class WEPPreference extends DialogPreference implements
         setDialogLayoutResource(R.layout.wep);
     }
 
+    public static String getAsciiContent(String v) {
+        if ((v.length() > 0) && (v.charAt(0) == '"')) {
+            return v.substring(1, v.length() - 1);
+        } else {
+            return null;
+        }
+    }
+
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
@@ -79,8 +87,8 @@ public class WEPPreference extends DialogPreference implements
         mShowPasswordCheckBox.setEnabled(enabled);
 
         if (enabled) {
-            if (password.charAt(0) == '"') {
-                String pass = password.substring(1, password.length()-1);
+            String pass = getAsciiContent(password);
+            if (pass != null) {
                 weptype = WEP_TYPE_ASCII;
                 mPasswordEdit.setText(pass);
             } else {
@@ -198,4 +206,5 @@ public class WEPPreference extends DialogPreference implements
             persistString(password);
         }
     }
+
 }

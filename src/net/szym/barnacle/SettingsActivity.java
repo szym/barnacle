@@ -33,7 +33,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         R.string.nat_firstport, R.string.nat_numports, R.string.nat_queue, R.string.nat_timeout, R.string.nat_timeout_tcp, 
         R.string.lan_script
     };
-    final static int[] checks = { R.string.nat_filter };
+    final static int[] checks = { R.string.nat_filter, R.string.lan_wext };
 
     private void setSummary(Preference p, CharSequence s) {
     	if ((s != null) && (s.length() > 0)) {

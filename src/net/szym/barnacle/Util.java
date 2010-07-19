@@ -18,6 +18,7 @@
 
 package net.szym.barnacle;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import android.content.BroadcastReceiver;
@@ -180,6 +181,29 @@ public class Util {
             return -1;
         }
     }
-    
 
+    public static String asc2hex(String asc) {
+        try {
+            byte[] bytes = asc.getBytes("US-ASCII");
+            StringBuilder builder = new StringBuilder(bytes.length * 2);
+            for (byte b : bytes) {
+                builder.append(Integer.toHexString(b));
+            }
+            return builder.toString();
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
+
+    public static String hex2asc(String hex) {
+        byte[] bytes = new byte[hex.length() / 2];
+        for (int i = 0; i < bytes.length; ++i) {
+            bytes[i] = Byte.parseByte(hex.substring(i * 2, (i + 1) * 2), 16);
+        }
+        try {
+            return new String(bytes, "US-ASCII");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
+    }
 }

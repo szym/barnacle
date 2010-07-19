@@ -28,6 +28,16 @@
 
 #include "log.hh"
 
+static inline bool ether_parse(const char *inp, uint8_t *a) {
+  for (int i = 0; i < 6; ++i) {
+    char *p;
+    a[i] = strtoul(inp, &p, 16);
+    if (p == inp) return false;
+    inp = p+1; // skip ':'
+  }
+  return true;
+}
+
 /**
  * ifconfig equivalent
  */
@@ -85,6 +95,14 @@ public:
       return false;
     }
     return true;
+  }
+
+  bool isUp() { // get oper state, NOTE: if iface missing it returns false too
+    if (ioctl(_sock, SIOCGIFFLAGS, &_ifr)) {
+      // no error message
+      return false;
+    }
+    return _ifr.ifr_flags & IFF_UP;
   }
 
   in_addr_t getAddress() {

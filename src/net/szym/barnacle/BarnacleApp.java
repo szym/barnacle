@@ -216,6 +216,12 @@ public class BarnacleApp extends android.app.Application {
                 if (ids[i] == R.string.lan_essid) {
                     v = '"'+v+'"';
                 }
+                if (ids[i] == R.string.lan_wep) {
+                    String pass = WEPPreference.getAsciiContent(v);
+                    if (pass != null) {
+                        v = Util.asc2hex(pass);
+                    }
+                }
                 sb.append("brncl_").append(k).append('=').append(v).append('\n');
             }
         }

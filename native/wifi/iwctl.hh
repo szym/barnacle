@@ -113,6 +113,13 @@ public:
     return true;
   }
 
+  bool commit() {
+    if (ioctl(_sock, SIOCSIWCOMMIT, &_iwr)) {
+      return false;
+    }
+    return true;
+  }
+
   bool setAuthParam(int idx, uint32_t value) {
     _iwr.u.param.flags = idx & IW_AUTH_INDEX;
     _iwr.u.param.value = value;
@@ -126,6 +133,7 @@ public:
   bool setWepKey(int idx, uint8_t *key) {
     _iwr.u.encoding.flags = (idx + 1) & IW_ENCODE_INDEX;
     if (key) {
+      //_iwr.u.encoding.flags |= IW_ENCODE_OPEN;
       _iwr.u.encoding.pointer = (caddr_t) key;
       _iwr.u.encoding.length = WepSize;
     } else {
@@ -133,7 +141,7 @@ public:
       _iwr.u.encoding.pointer = (caddr_t) NULL;
       _iwr.u.encoding.length = 0;
     }
-    _iwr.u.data = _iwr.u.encoding;
+    //_iwr.u.data = _iwr.u.encoding;
     if (ioctl(_sock, SIOCSIWENCODE, &_iwr) < 0) {
       ERR("Could not set WEP key %d: %s\n", idx, strerror(errno));
       return false;
@@ -145,7 +153,7 @@ public:
     _iwr.u.encoding.flags = (idx + 1) & IW_ENCODE_INDEX;
     _iwr.u.encoding.pointer = (caddr_t) NULL;
     _iwr.u.encoding.length = 0;
-    _iwr.u.data = _iwr.u.encoding;
+    //_iwr.u.data = _iwr.u.encoding;
     if (ioctl(_sock, SIOCSIWENCODE, &_iwr) < 0) {
       ERR("Could not select WEP TX key %d: %s\n", idx, strerror(errno));
       return false;
@@ -172,7 +180,7 @@ public:
   bool configureWep(uint8_t *key) {
     return disableWPA()
         && setWepKey(0, key)
-        ;//&& setWepTx(0);
+        && setWepTx(0);
   }
 
   // TODO: monitor WLAN events
