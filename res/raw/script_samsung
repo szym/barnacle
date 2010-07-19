@@ -6,6 +6,9 @@ set -e
 MODULE=/lib/modules/dhd.ko
 FIRMWARE=/etc/rtecdc.bin
 
-[ -e $FIRMWARE ] || echo "samsung: no rtecdc.bin found!"
-
-insmod $MODULE firmware_path=$FIRMWARE nvram_path=/etc/nvram.txt
+if [ $1 == load ]; then
+    [ -e $FIRMWARE ] || echo "samsung: no rtecdc.bin found!"
+    insmod $MODULE firmware_path=$FIRMWARE nvram_path=/etc/nvram.txt
+else
+    rmmod $MODULE
+fi
