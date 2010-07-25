@@ -17,9 +17,12 @@
 		<ListPreference android:title="Channel"
 			android:key="@string/lan_channel" android:defaultValue="1"
 			android:entries="@array/channel_names" android:entryValues="@array/channel_values" />
-        <ListPreference android:title="Custom Ad-hoc Setup"
+        <ListPreference android:title="Custom Wifi Ad-hoc"
             android:key="@string/lan_script" android:defaultValue=""
             android:entries="@array/script_names" android:entryValues="@array/script_values" />
+        <CheckBoxPreference android:title="Skip wpa_supplicant"
+            android:summary="Configure wifi directly"
+            android:key="@string/lan_wext" />
 	</PreferenceCategory>
     <PreferenceCategory android:title="Interfaces">
         <EditTextPreference android:title="WAN"
@@ -77,10 +80,5 @@
 				android:singleLine="true" />
 		</PreferenceScreen>
     </PreferenceCategory>
-    <!-- 
-    <PreferenceCategory android:title="Fixes">
-        <CheckBoxPreference android:title="su workaround" android:key="su_is_buggy" android:defaultValue="false"
-            android:summaryOn="su requires multiple arguments" android:summaryOff="su takes one argument" />
-    </PreferenceCategory>
-     -->
+
 </PreferenceScreen>

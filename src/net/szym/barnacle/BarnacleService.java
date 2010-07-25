@@ -1,4 +1,4 @@
-/*	
+/*
  *  This file is part of Barnacle Wifi Tether
  *  Copyright (C) 2010 by Szymon Jakubczak
  *
@@ -73,7 +73,7 @@ public class BarnacleService extends android.app.Service {
         final String mac;
         final String ip;
         final String hostname;
-        boolean allowed; 
+        boolean allowed;
         ClientData(String m, String i, String h) { mac = m; ip = i; hostname = h; allowed = false; }
         public String toString() { return mac + " " + ip + " " + hostname; }
         public String toNiceString() { return hostname != null ? hostname : mac; }
@@ -94,7 +94,7 @@ public class BarnacleService extends android.app.Service {
     public void assocRequest() {
         mHandler.sendEmptyMessage(MSG_ASSOC);
     }
-    
+
     public void filterRequest(String mac, boolean allowed) {
         mHandler.obtainMessage(MSG_FILTER, (allowed ? "MACA " : "MACD ") + mac).sendToTarget();
     }
@@ -131,8 +131,8 @@ public class BarnacleService extends android.app.Service {
 
     @Override
     public void onDestroy() {
-    	if (state != STATE_STOPPED) 
-    		Log.e(BarnacleApp.TAG, "BarnacleService destroyed while running!");
+        if (state != STATE_STOPPED)
+            Log.e(BarnacleApp.TAG, "BarnacleService destroyed while running!");
         stopProcess(); // ensure we clean up
         super.onDestroy();
     }
@@ -148,8 +148,8 @@ public class BarnacleService extends android.app.Service {
         case MSG_EXCEPTION:
             if (state == STATE_STOPPED) return;
             Throwable thr = (Throwable)msg.obj;
-            log(true, "Exception occurred! " + thr.getMessage());
-            Log.e(BarnacleApp.TAG,"Exception " + thr.getMessage() + " " + Log.getStackTraceString(thr));
+            log(true, getString(R.string.exception) + " " + thr.getMessage());
+            Log.e(BarnacleApp.TAG, "Exception " + thr.getMessage() + " " + Log.getStackTraceString(thr));
             stopProcess();
             state = STATE_STOPPED;
             break;
@@ -158,7 +158,7 @@ public class BarnacleService extends android.app.Service {
             if (msg.obj != null) {
                 log(true, (String)msg.obj); // just dump it and ignore it
             } else {
-                log(true, "Process stopped unexpectedly");
+                log(true, getString(R.string.unexpected));
                 stopProcess();
                 app.failed(BarnacleApp.ERROR_OTHER);
                 state = STATE_STOPPED;
@@ -178,13 +178,13 @@ public class BarnacleService extends android.app.Service {
             } else if (line.startsWith("OK")) {
                 if_lan = line.split(" +")[1];
                 if (state == STATE_STARTING) {
-                	// FIXME later: we should always connect to NAT, not just if filtering is enabled
-                	if (app.prefs.getBoolean(getString(R.string.nat_filter), false)) {
-                		connectToNat();
-                	}
-                	
+                    // FIXME later: we should always connect to NAT, not just if filtering is enabled
+                    if (app.prefs.getBoolean(getString(R.string.nat_filter), false)) {
+                        connectToNat();
+                    }
+
                     state = STATE_RUNNING;
-                    log(false, "Processes started successfully");
+                    log(false, getString(R.string.running));
                     clients.clear();
                     stats.init(Util.fetchTrafficData(if_lan));
                     app.foundIfLan(if_lan);
@@ -197,20 +197,20 @@ public class BarnacleService extends android.app.Service {
             break;
         case MSG_NETSREADY:
             if (state == STATE_STARTING) {
-                log(false, "Data network is ready");
+                log(false, getString(R.string.dataready));
                 if (!app.prepareIfWan()) {
-                    log(true, "Could not find WAN interface");
+                    log(true, getString(R.string.wanerr));
                     state = STATE_STOPPED;
                     break;
                 }
                 if (!app.prepareIni()) {
-                    log(true, "Could not prepare .ini");
+                    log(true, getString(R.string.inierr));
                     state = STATE_STOPPED;
                     break;
                 }
-                log(false, ".ini file prepared");
+                log(false, getString(R.string.iniok));
                 if (!startProcess()) {
-                    log(true, "Could not start the process!");
+                    log(true, getString(R.string.starterr));
                     state = STATE_STOPPED;
                     break;
                 }
@@ -219,33 +219,33 @@ public class BarnacleService extends android.app.Service {
         case MSG_START:
             if (state != STATE_STOPPED) return;
             log.clear();
-            log(false, "Starting...");
-            
+            log(false, getString(R.string.starting));
+
             if (!app.prepareBinaries()) {
-                log(true, "Could not unpack binaries");
+                log(true, getString(R.string.unpackerr));
                 state = STATE_STOPPED;
                 break;
             }
-            
+
             state = STATE_STARTING;
             prepareNets();
             break;
         case MSG_STOP:
             if (state == STATE_STOPPED) return;
             stopProcess();
-            log(false, "Stopped");
+            log(false, getString(R.string.stopped));
             state = STATE_STOPPED;
             break;
         case MSG_ASSOC:
             if (state != STATE_RUNNING) return;
             if (tellProcess("WLAN")) {
-                app.updateToast("beaconing ad-hoc network", true);
+                app.updateToast(getString(R.string.beaconing), true);
             }
             break;
         case MSG_FILTER:
             if (state != STATE_RUNNING) return;
             if (tellNat((String)msg.obj)) {
-                app.updateToast("Updated NAT filter", false);
+                app.updateToast(getString(R.string.filterupdated), false);
             }
         case MSG_STATS:
             mHandler.removeMessages(MSG_STATS); // FIXME: is this the best way of doing this?
@@ -290,7 +290,8 @@ public class BarnacleService extends android.app.Service {
             ClientData c = clients.get(i);
             if (c.mac.equals(cd.mac)) {
                 if (c.ip.equals(cd.ip)) {
-                    log(false, "Renewed " + cd.toNiceString());
+                    log(false, String.format(getString(R.string.renewed),
+                                             cd.toNiceString()));
                     return; // no change
                 }
                 cd.allowed = c.allowed;
@@ -299,7 +300,8 @@ public class BarnacleService extends android.app.Service {
             }
         }
         clients.add(cd);
-        log(false, "Connected " + cd.toNiceString());
+        log(false, String.format(getString(R.string.connected),
+                cd.toNiceString()));
         app.clientAdded(cd);
     }
 
@@ -311,7 +313,7 @@ public class BarnacleService extends android.app.Service {
 
     private void prepareNets() {
         if (!checkNets()) {
-            app.updateToast("Disabling Wifi Manager...", false);
+            app.updateToast(getString(R.string.disablewifi), false);
             wifiManager.setWifiEnabled(false);
             String[] actions = {WifiManager.WIFI_STATE_CHANGED_ACTION, ConnectivityManager.CONNECTIVITY_ACTION};
             new Util.WaitingReceiver(actions) {
@@ -327,7 +329,7 @@ public class BarnacleService extends android.app.Service {
             }.register(this);
             return;
         }
-        mHandler.sendEmptyMessage(MSG_NETSREADY); 
+        mHandler.sendEmptyMessage(MSG_NETSREADY);
     }
 
     private boolean startProcess() {
@@ -344,7 +346,7 @@ public class BarnacleService extends android.app.Service {
             threads[0].start();
             threads[1].start();
         } catch (Exception e) {
-            // bam!
+            // FIXME: this code is dead because FILE_SCRIPT runs su
             log(true, "su didn't work, do you have root?");
             Log.e(BarnacleApp.TAG, "su failed " + e.toString());
             app.failed(BarnacleApp.ERROR_ROOT);
@@ -352,33 +354,33 @@ public class BarnacleService extends android.app.Service {
         }
         return true;
     }
-    
-    private void connectToNat() { 
-    	nat_ctrl = new LocalSocket();
-    	for (int i = 0; i < 3; ++i) {
-	    	try {
-	    		nat_ctrl.connect(
-					new LocalSocketAddress(
-						app.natCtrlPath(), 
-						LocalSocketAddress.Namespace.FILESYSTEM
-					)
-				); // NOTE: TIMEOUT IS NOT SUPPORTED!
-	    		log(false, "Connected to NAT");
-	    		return;
-	    	} catch (java.io.IOException e) {
-	    		Log.e(BarnacleApp.TAG, "LocalSocket.connect to '" + app.natCtrlPath() + 
-			               "' failed: " + e.toString());
-	    	}
-	    	try {
-	    		Thread.sleep(100); // this is so wrong -- service should not halt
-	    	} catch (InterruptedException e) {
-	    		break;
-	    	}
-    	}
-		log(true, "Warning: Could not connect to NAT");
-		
-		//nat_ctrl.close();
-		nat_ctrl = null;
+
+    private void connectToNat() {
+        nat_ctrl = new LocalSocket();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                nat_ctrl.connect(
+                    new LocalSocketAddress(
+                        app.natCtrlPath(),
+                        LocalSocketAddress.Namespace.FILESYSTEM
+                    )
+                ); // NOTE: TIMEOUT IS NOT SUPPORTED!
+                log(false, getString(R.string.filterok));
+                return;
+            } catch (java.io.IOException e) {
+                Log.e(BarnacleApp.TAG, "LocalSocket.connect to '" + app.natCtrlPath() +
+                          "' failed: " + e.toString());
+            }
+            try {
+                Thread.sleep(100); // this is so wrong -- service should not halt
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+        log(true, getString(R.string.filtererr));
+
+        //nat_ctrl.close();
+        nat_ctrl = null;
     }
 
     private boolean tellProcess(String msg) {
@@ -390,7 +392,7 @@ public class BarnacleService extends android.app.Service {
         }
         return false;
     }
-    
+
     private boolean tellNat(String msg) {
         if (nat_ctrl != null) {
             try {
@@ -400,25 +402,37 @@ public class BarnacleService extends android.app.Service {
                 dos.writeBytes(msg);
                 return true;
             } catch (Exception e) {
-            	log(true, "Warning: NAT control disabled");
-            	nat_ctrl = null;
-            } 
+                log(true, getString(R.string.filtererr));
+                nat_ctrl = null;
+            }
         }
         return false;
     }
-    
+
     private void stopProcess() {
         if (process != null) {
             // first, just close the stream
-            try {
-                if (state == STATE_RUNNING) {
+            if (state != STATE_STOPPED) {
+                try {
                     process.getOutputStream().close();
-                    process.waitFor(); // yeah - it's blocking
+                } catch (Exception e) {
+                    Log.w(BarnacleApp.TAG, "Exception while closing process");
                 }
-            } catch (Exception e) { // we ignore it
-            } finally {
-                process.destroy(); // this is not good
             }
+            try {
+                process.waitFor(); // blocking!
+            } catch (InterruptedException e) {
+                Log.e(BarnacleApp.TAG, "");
+            }
+
+            try {
+                int exit_status = process.exitValue();
+                Log.i(BarnacleApp.TAG, "Process exited with status: " + exit_status);
+            } catch (IllegalThreadStateException e) {
+                // this is not good
+                log(true, getString(R.string.dirtystop));
+            }
+            process.destroy();
             process = null;
             threads[0].interrupt();
             threads[1].interrupt();

@@ -1,7 +1,8 @@
 #!/system/bin/sh
 # main runner (process manager) for barnacle, root required
 
-set -e
+# NOTE: we can't trap so don't set -e
+#set -e
 
 # load the driver
 # NOTE: Android's shell is ash and there is no "test" or "["
@@ -15,11 +16,17 @@ chmod 750 ./$brncl_lan_script
 ./dhcp & pid_dhcp=$!
 ./nat & pid_nat=$!
 
-# the association loop
-./wifi assoc
+cleanup() {
+    kill $pid_dhcp     2>/dev/null || true
+    kill $pid_nat      2>/dev/null || true
+    rm $brncl_nat_ctrl 2>/dev/null || true
+    ./wifi unload
+}
 
-kill $pid_dhcp     2>/dev/null || true
-kill $pid_nat      2>/dev/null || true
-rm $brncl_nat_ctrl 2>/dev/null || true
-./wifi unload
+# NOTE: trap causes SIGSEGV on many phones!
+# trap cleanup SIGINT SIGQUIT SIGABRT SIGKILL SIGTERM EXIT
+
+# the association loop
+./wifi assoc || true
+cleanup
 

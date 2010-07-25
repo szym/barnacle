@@ -139,7 +139,9 @@ void DHCP::parse_req(int &msg_type, in_addr_t &requested_ip, char * &hostname) {
         msg_type = ops[i+2];
         break;
       case OP_REQUESTED_IP:
-        requested_ip = *(in_addr_t *)(ops+i+2);
+        //requested_ip = *(in_addr_t *)(ops+i+2);
+        // to avoid sigbus, we use memcpy
+        memcpy(&requested_ip, ops+i+2, sizeof(in_addr_t));
         break;
       case OP_HOSTNAME:
         hostname = (char *)(ops+i+2);

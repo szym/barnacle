@@ -57,9 +57,11 @@ public class MACPreference extends EditTextPreference {
     protected void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
             // verify now that it's an IP
-            String addr = this.getEditText().getText().toString();
+            String addr = getEditText().getText().toString();
             if (addr.length() != 0 && !validate(addr)) { // note empty address is fine
-                Toast.makeText(this.getContext(), "Invalid MAC address", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), 
+                               getContext().getString(R.string.invalidmac),
+                               Toast.LENGTH_SHORT).show();
                 positiveResult = false;
             }
         }

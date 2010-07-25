@@ -49,6 +49,9 @@ int main(int, const char **) {
   c.netmask = ic.getMask();
   c.subnet  = c.gw & c.netmask;
 
+  if ((c.gw == INADDR_NONE) || (c.netmask == INADDR_NONE))
+    return -3;
+
   DHCP dhcp(c);
   if (!dhcp.init())
     return -3;

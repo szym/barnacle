@@ -1,4 +1,4 @@
-/*	
+/*
  *  This file is part of Barnacle Wifi Tether
  *  Copyright (C) 2010 by Szymon Jakubczak
  *
@@ -40,9 +40,9 @@ public class BarnacleApp extends android.app.Application {
 
     final static String FILE_SCRIPT = "setup";
     final static String FILE_INI    = "brncl.ini";
-    
+
     final static String ACTION_CLIENTS = "net.szym.barnacle.SHOW_CLIENTS";
-    
+
     final static int ERROR_ROOT = 1;
     final static int ERROR_OTHER = 2;
 
@@ -73,7 +73,7 @@ public class BarnacleApp extends android.app.Application {
         notificationClientAdded = new Notification(android.R.drawable.stat_sys_warning,
                                                    getString(R.string.notify_client), 0);
         notificationClientAdded.defaults = Notification.DEFAULT_SOUND; // | Notification.DEFAULT_VIBRATE // requires permission
-        
+
         ensureService();
     }
 
@@ -81,7 +81,7 @@ public class BarnacleApp extends android.app.Application {
         if (service != null) return; // ensured
         startService(new Intent(this, BarnacleService.class));
     }
-    
+
     public void setStatusActivity(StatusActivity a) { // for updates
         statusActivity = a;
     }
@@ -123,23 +123,23 @@ public class BarnacleApp extends android.app.Application {
         notificationManager.notify(NOTIFY_RUNNING, notification);
         //service.startForeground(NOTIFY_RUNNING, notification);
     }
-    
+
     public void serviceStopped() {
         notificationManager.cancel(NOTIFY_RUNNING);
         notificationManager.cancel(NOTIFY_CLIENT);
     }
-    
+
     public void failed(int err) {
-    	if (statusActivity != null) {
-    		if (err == ERROR_ROOT) {
-    			statusActivity.showDialog(StatusActivity.DLG_ROOT);
-    		} else if (err == ERROR_OTHER) {
-    			statusActivity.getTabHost().setCurrentTab(0); // show log
-    	    	statusActivity.showDialog(StatusActivity.DLG_ERROR);
-    		}
-    	}
+        if (statusActivity != null) {
+            if (err == ERROR_ROOT) {
+                statusActivity.showDialog(StatusActivity.DLG_ROOT);
+            } else if (err == ERROR_OTHER) {
+                statusActivity.getTabHost().setCurrentTab(0); // show log
+                statusActivity.showDialog(StatusActivity.DLG_ERROR);
+            }
+        }
     }
-    
+
     private boolean unpackRaw(int id, String filename) {
         Log.d(TAG, "unpacking " + id + " to " + filename);
         try {
@@ -153,19 +153,19 @@ public class BarnacleApp extends android.app.Application {
             }
             os.close();
         } catch (Exception e) {
-            updateToast("Could not unpack " + filename + ": " + e.getMessage(), true);
+            updateToast(getString(R.string.unpackerr1) + filename + ": " + e.getMessage(), true);
             Log.e(TAG, "unpack " + filename + ": " + e + ": " + e.getMessage() + " " + e.getCause());
             return false;
         }
         return true;
     }
-    
+
     private boolean installIfNeeded(boolean newVersion, int resource, String filename) {
-    	if(newVersion || !getFileStreamPath(filename).exists()) {
-    		// binary does not exist or old, install it
-        	return unpackRaw(resource, filename); 
+        if(newVersion || !getFileStreamPath(filename).exists()) {
+            // binary does not exist or old, install it
+            return unpackRaw(resource, filename);
         }
-    	return true;
+        return true;
     }
 
     /** Prepare the binaries */
@@ -181,7 +181,7 @@ public class BarnacleApp extends android.app.Application {
         if (!installIfNeeded(newVersion, R.raw.dhcp,  "dhcp")) 	  return false;
         if (!installIfNeeded(newVersion, R.raw.nat,   "nat")) 	  return false;
         if (!installIfNeeded(newVersion, R.raw.wifi,  "wifi"))    return false;
-                   
+
         // unpack all scripts
         String [] scripts = getResources().getStringArray(R.array.script_values);
         //int [] ids = getResources().getIntArray(R.array.script_ids); // doesn't work -- buggo in AOSP
@@ -192,9 +192,9 @@ public class BarnacleApp extends android.app.Application {
             if (!installIfNeeded(newVersion, id, scripts[i])) return false;
         }
         ar.recycle();
-        
+
         if (Util.exec("chmod 750 " + getFileStreamPath(FILE_SCRIPT)) != 0) {
-            updateToast("Could not make the binary executable", true);
+            updateToast(getString(R.string.chmoderr), true);
             return false;
         }
         prefs.edit().putInt("bin.version", versionCode).commit(); // installed
@@ -204,7 +204,7 @@ public class BarnacleApp extends android.app.Application {
     protected String natCtrlPath() {
     	return getFileStreamPath("nat_ctrl").getPath();
     }
-    
+
     /** Prepare .ini file from preferences */
     protected boolean prepareIni() {
         StringBuilder sb = new StringBuilder();
@@ -232,16 +232,16 @@ public class BarnacleApp extends android.app.Application {
             if (prefs.getBoolean(k, false))
                 sb.append("brncl_").append(k).append("=1\n");
         }
-        
+
         // only enable nat_ctrl if filtering is enabled
-        // FIXME: this should not be tied like this 
+        // FIXME: this should not be tied like this
         if (prefs.getBoolean(getString(R.string.nat_filter), false)) {
         	sb.append("brncl_nat_ctrl=").append(natCtrlPath());
         }
-        
+
         if (sb.length() == 0) {
             // wow, no preferences?
-            updateToast("Please, set your preferences", false);
+            updateToast(getString(R.string.noprefs), false);
             try {
                 PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
                 statusActivity.startActivity(new Intent(this, SettingsActivity.class));
@@ -278,7 +278,7 @@ public class BarnacleApp extends android.app.Application {
             }
         }
         if (if_wan.length() != 0) {
-            updateToast("Mobile data interface found: " + if_wan, false);
+            updateToast(getString(R.string.wanok) + if_wan, false);
             prefs.edit().putString(getString(R.string.if_wan), if_wan).commit();
             return true;
         }
@@ -288,7 +288,7 @@ public class BarnacleApp extends android.app.Application {
     protected void foundIfLan(String found_if_lan) {
         String if_lan = prefs.getString(getString(R.string.if_lan), "");
         if (if_lan.length() == 0) {
-            updateToast("Wireless interface found: " + found_if_lan, false);
+            updateToast(getString(R.string.lanok) + found_if_lan, false);
         }
         // NOTE: always use the name found by the process
         if_lan = found_if_lan;

@@ -19,6 +19,7 @@
 #ifndef INCLUDED_IWCTL_HH
 #define INCLUDED_IWCTL_HH
 
+#include <stdint.h>
 #include <ctype.h>
 #include <linux/wireless.h> // the most painful header ever
 #include <netinet/if_ether.h> // for ETHERTYPE_ and ARPHRD
@@ -27,7 +28,7 @@
 
 #include <ifctl.hh>
 
-
+// TODO: support 40 bits
 const int WepSize = 13; // 104 bits
 static inline bool wep_parse(const char *inp, uint8_t *var) {
   if (strlen(inp) != 2*WepSize)
@@ -45,6 +46,61 @@ static inline bool wep_parse(const char *inp, uint8_t *var) {
 static inline int chan2freq(int chan) {
   return 2407 + chan * 5; // MHz
 }
+
+namespace TIWLAN {
+  const unsigned PRIVATE_CMD_SET_FLAG = 0x00000001;
+  const unsigned PRIVATE_CMD_GET_FLAG = 0x00000002;
+
+  struct ti_private_cmd {
+    uint32_t   cmd;        // parameter name
+    uint32_t   flags;      // command action type (PRIVATE_CMD_SET_FLAG | PRIVATE_CMD_GET_FLAG)
+    void*     in_buffer;    // Pointer to Input Buffer
+    uint32_t in_buffer_len;
+    void*     out_buffer;   // Pointer to Output buffer
+    uint32_t out_buffer_len;
+  };
+
+
+  bool private_set(int sock, iwreq &iwr, uint32_t ioctl_cmd, uint32_t val) {
+    ti_private_cmd cmd;
+    cmd.cmd = ioctl_cmd;
+    cmd.flags = PRIVATE_CMD_SET_FLAG;
+    cmd.in_buffer = &val;
+    cmd.in_buffer_len = sizeof(val);
+
+    iwr.u.data.pointer = &cmd;
+    iwr.u.data.length = sizeof(cmd);
+    iwr.u.data.flags = 0;
+    return (ioctl(sock, SIOCIWFIRSTPRIV, &iwr) == 0);
+  }
+
+  bool private_get(int sock, iwreq &iwr, uint32_t ioctl_cmd, uint32_t &val) {
+    ti_private_cmd cmd;
+    cmd.cmd = ioctl_cmd;
+    cmd.flags = PRIVATE_CMD_SET_FLAG;
+    cmd.out_buffer = &val;
+    cmd.out_buffer_len = sizeof(val);
+
+    iwr.u.data.pointer = &cmd;
+    iwr.u.data.length = sizeof(cmd);
+    iwr.u.data.flags = 0;
+    return (ioctl(sock, SIOCIWFIRSTPRIV, &iwr) == 0);
+  }
+
+
+  const unsigned SET_BIT = 0x08000000;
+  const unsigned GET_BIT = 0x00800000;
+  const unsigned RSN_MODULE_PARAM = 0x0800;
+  const unsigned RSN_ENCRYPTION_STATUS_PARAM = SET_BIT | GET_BIT | RSN_MODULE_PARAM | 0x04;
+
+  bool enable_wep(int sock, iwreq &iwr, bool yes) {
+    return private_set(sock, iwr, RSN_ENCRYPTION_STATUS_PARAM, yes ? 1 : 0);
+  }
+
+  bool check_wep(int sock, iwreq &iwr, uint32_t &v) {
+    return private_get(sock, iwr, RSN_ENCRYPTION_STATUS_PARAM, v);
+  }
+};
 
 
 /**
@@ -133,7 +189,7 @@ public:
   bool setWepKey(int idx, uint8_t *key) {
     _iwr.u.encoding.flags = (idx + 1) & IW_ENCODE_INDEX;
     if (key) {
-      //_iwr.u.encoding.flags |= IW_ENCODE_OPEN;
+      _iwr.u.encoding.flags |= IW_ENCODE_OPEN;
       _iwr.u.encoding.pointer = (caddr_t) key;
       _iwr.u.encoding.length = WepSize;
     } else {
@@ -178,9 +234,26 @@ public:
   }
 
   bool configureWep(uint8_t *key) {
-    return disableWPA()
+    if ( disableWPA()
         && setWepKey(0, key)
-        && setWepTx(0);
+        && setWepTx(0) ) {
+      if ((_iwr.ifr_name[0] == 't') && (_iwr.ifr_name[1] == 'i')) {
+        // I think it's a TI device, let's try the priv ioctl:
+        DBG("attempting private TI ioctl");
+        if (!TIWLAN::enable_wep(_sock, _iwr, 1)) {
+          DBG("Private ioctl (set) failed %s\n", strerror(errno));
+        } else {
+          uint32_t val = 7777;
+          if (!TIWLAN::check_wep(_sock, _iwr, val)) {
+            DBG("Private ioctl (get) failed %s\n", strerror(errno));
+          } else {
+            LOG("WEP status %d\n", val);
+          }
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   // TODO: monitor WLAN events

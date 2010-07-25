@@ -20,16 +20,18 @@
 #include "iwctl.hh"
 #include "wifi.hh"
 
-int configure() {
-
+int config() {
   char  iflan[IFNAMSIZ];
+  char  ifwan[IFNAMSIZ]; // for MTU
   in_addr_t lan_gw;
   in_addr_t lan_netmask;
 
+  ifwan[0] = 0;
   {
     using namespace Config;
     Param params[] = {
      { "brncl_if_lan",      new String(iflan, IFNAMSIZ),  true },
+     { "brncl_if_wan",      new String(ifwan, IFNAMSIZ),  false },
      { "brncl_lan_gw",      new IP(lan_gw),               true },
      { "brncl_lan_netmask", new IP(lan_netmask),          true },
      { 0, NULL, false }
@@ -37,8 +39,24 @@ int configure() {
     if (!configure(params))
       return -2;
   }
+
   IfCtl ic(iflan);
-  return (ic.setAddress(lan_gw) && ic.setMask(lan_netmask) && ic.setState(true)) ? 0 : -1;
+
+  bool success = (ic.setAddress(lan_gw)
+               && ic.setMask(lan_netmask)
+               && ic.setState(true));
+
+  if (success && ifwan[0]) {
+    int mtulan = ic.getMTU();
+    int mtuwan = IfCtl(ifwan).getMTU();
+    DBG("MTU wan: %d lan: %d\n", mtuwan, mtulan);
+    if ((mtuwan > 0) && ((mtulan > mtuwan) || (mtulan < 0))) {
+      LOG("Reducing MTU from %d to %d\n", mtulan, mtuwan);
+      ic.setMTU(mtuwan);
+    }
+  }
+
+  return success ? 0 : -1;
 }
 
 
@@ -132,7 +150,7 @@ int main(int argc, const char * argv[]) {
     if (!strcmp(argv[1], "assoc")) {
       return assoc_loop();
     } else if (!strcmp(argv[1], "config")) {
-      return configure();
+      return config();
     } else if (!strcmp(argv[1], "load")) {
       return Wifi::load_driver() ? 0 : -1;
     } else if (!strcmp(argv[1], "unload")) {

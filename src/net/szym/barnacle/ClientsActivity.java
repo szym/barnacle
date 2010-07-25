@@ -1,4 +1,4 @@
-/*	
+/*
  *  This file is part of Barnacle Wifi Tether
  *  Copyright (C) 2010 by Szymon Jakubczak
  *
@@ -56,7 +56,7 @@ public class ClientsActivity extends android.app.ListActivity {
                 ipaddress.setText(client.ip);
                 hostname.setText(client.hostname != null ? client.hostname : "[ none ]");
                 allowed.setChecked(client.allowed);
-                if (app.service.hasFiltering()) { 
+                if (app.service.hasFiltering()) {
                     allowed.setVisibility(CheckBox.VISIBLE);
                     allowed.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
                         @Override
@@ -66,7 +66,7 @@ public class ClientsActivity extends android.app.ListActivity {
                         }
                     });
                 } else {
-                	allowed.setVisibility(CheckBox.INVISIBLE);
+                    allowed.setVisibility(CheckBox.INVISIBLE);
                 }
                 return view;
             }

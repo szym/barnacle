@@ -8,7 +8,38 @@
     <string name="notify_error">Error occured</string>
     
     <string name="announce">Associate</string>
+    
+    <string name="noprefs">Please, set your preferences</string>
+    
+    
+    <string name="starting">Starting...</string>
+    <string name="dataready">Data network is ready</string>
+    <string name="disablewifi">Disabling Wifi Manager...</string>
+    <string name="running">Running...</string>
+    <string name="beaconing">beaconing ad-hoc network</string>
+    <string name="filterok">Connected to NAT</string>
+    <string name="filtererr">Warning: NAT filtering disabled</string>
+    <string name="filterupdated">Updated NAT filter</string>
+    <string name="connected">Connected %s</string>
+    <string name="renewed">Renewed %s</string>
+    <string name="stopped">Stopped</string>
+  
+    
+    <string name="wanerr">Could not find WAN interface</string>
+    <string name="wanok">Mobile data interface found: </string>
+    <string name="lanok">Wireless interface found: </string>
+    <string name="inierr">Could not prepare .ini</string>
+    <string name="iniok">.ini file prepared</string>
+    <string name="starterr">Could not start the process!</string>
+    <string name="unpackerr">Could not unpack binaries</string>
+    <string name="unpackerr1">Could not unpack "</string>
+    <string name="chmoderr">Could not make the binary executable</string>
+    <string name="dirtystop">Warning: did not finish cleanly</string>
+    <string name="unexpected">Stopped unexpectedly!</string>
+    <string name="exception">Exception occured!</string>
 
+    <string name="invalidip">Invalid IP address</string>
+    <string name="invalidmac">Invalid MAC address</string>
 
 	<string name="if_wan">if_wan</string>
 	<string name="if_lan">if_lan</string>
@@ -28,6 +59,7 @@
 	<string name="lan_bssid">lan_bssid</string>
 	<string name="lan_channel">lan_channel</string>
 	<string name="lan_wep">lan_wep</string>
+	<string name="lan_wext">lan_wext</string>
 	
     <string name="nat_filter">nat_filter</string>
     <string name="nat_ctrl">nat_ctrl</string>
@@ -69,7 +101,7 @@
     <integer-array name="script_ids">
        <item>-1</item>
        <item>@raw/script_hero</item> <!-- THIS WORKS! YAY! -->
-       <item>@raw/script_samsung</item> <!-- THIS WORKS! YAY! -->
+       <item>@raw/script_samsung</item>
     </integer-array>
 	<string-array name="script_values">
         <item></item>

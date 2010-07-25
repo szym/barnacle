@@ -39,7 +39,7 @@ set -e
 
 export brncl_if_wan brncl_if_lan
 export brncl_lan_gw brncl_lan_netmask
-export brncl_lan_essid brncl_lan_bssid brncl_lan_wep brncl_lan_channel brncl_lan_script
+export brncl_lan_essid brncl_lan_bssid brncl_lan_wep brncl_lan_channel brncl_lan_script brncl_lan_wext
 export brncl_dhcp_dns1 brncl_dhcp_dns2 brncl_dhcp_leasetime brncl_dhcp_firsthost brncl_dhcp_numhosts
 export brncl_nat_queue brncl_nat_timeout brncl_nat_timeout_tcp brncl_nat_firstport brncl_nat_numports
 export brncl_nat_log brncl_nat_ctrl

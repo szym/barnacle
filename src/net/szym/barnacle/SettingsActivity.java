@@ -1,4 +1,4 @@
-/*	
+/*
  *  This file is part of Barnacle Wifi Tether
  *  Copyright (C) 2010 by Szymon Jakubczak
  *
@@ -27,22 +27,22 @@ import android.widget.Toast;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
     final static int[] prefids = {
-        R.string.if_lan, R.string.if_wan, 
+        R.string.if_lan, R.string.if_wan,
         R.string.lan_gw, R.string.lan_netmask, R.string.lan_essid, R.string.lan_bssid, R.string.lan_wep, R.string.lan_channel,
         R.string.dhcp_firsthost, R.string.dhcp_numhosts, R.string.dhcp_leasetime, R.string.dhcp_dns1, R.string.dhcp_dns2,
-        R.string.nat_firstport, R.string.nat_numports, R.string.nat_queue, R.string.nat_timeout, R.string.nat_timeout_tcp, 
+        R.string.nat_firstport, R.string.nat_numports, R.string.nat_queue, R.string.nat_timeout, R.string.nat_timeout_tcp,
         R.string.lan_script
     };
     final static int[] checks = { R.string.nat_filter, R.string.lan_wext };
 
     private void setSummary(Preference p, CharSequence s) {
-    	if ((s != null) && (s.length() > 0)) {
-    		p.setSummary("Current: " + s);
-    	} else {
-    		p.setSummary(null);
-    	}
+        if ((s != null) && (s.length() > 0)) {
+            p.setSummary("Current: " + s);
+        } else {
+            p.setSummary(null);
+        }
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +60,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         }
         for (int i = 0; i < checks.length; ++i) {
-        	Preference pref = findPreference(getString(checks[i]));
+            Preference pref = findPreference(getString(checks[i]));
             pref.setOnPreferenceChangeListener(this);
         }
     }

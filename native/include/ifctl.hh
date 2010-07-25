@@ -97,6 +97,15 @@ public:
     return true;
   }
 
+  bool setMTU(int mtu) {
+    _ifr.ifr_mtu = mtu;
+    if (ioctl(_sock, SIOCSIFMTU, &_ifr)) {
+      fail("Could not set MTU of %s: %s\n");
+      return false;
+    }
+    return true;
+  }
+
   bool isUp() { // get oper state, NOTE: if iface missing it returns false too
     if (ioctl(_sock, SIOCGIFFLAGS, &_ifr)) {
       // no error message
@@ -116,9 +125,17 @@ public:
   in_addr_t getMask() {
     if (ioctl(_sock, SIOCGIFNETMASK, &_ifr)) {
       fail("Getting netmask of %s failed: %s\n");
-      return false;
+      return INADDR_NONE;
     }
     return ((sockaddr_in *)&_ifr.ifr_addr)->sin_addr.s_addr;
+  }
+
+  int getMTU() {
+    if (ioctl(_sock, SIOCGIFMTU, &_ifr)) {
+      fail("Could not get MTU of %s: %s\n");
+      return -1;
+    }
+    return _ifr.ifr_mtu;
   }
 };
 

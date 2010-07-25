@@ -56,9 +56,11 @@ public class IPPreference extends EditTextPreference {
     protected void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
             // verify now that it's an IP
-            String addr = this.getEditText().getText().toString();
+            String addr = getEditText().getText().toString();
             if (!validate(addr)) {
-                Toast.makeText(this.getContext(), "Invalid IP address", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), 
+                               getContext().getString(R.string.invalidip), 
+                               Toast.LENGTH_SHORT).show();
                 positiveResult = false;
             }
         }

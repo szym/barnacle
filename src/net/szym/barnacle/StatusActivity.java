@@ -1,4 +1,4 @@
-/*	
+/*
  *  This file is part of Barnacle Wifi Tether
  *  Copyright (C) 2010 by Szymon Jakubczak
  *
@@ -37,9 +37,9 @@ import android.widget.ToggleButton;
 import android.widget.Button;
 
 public class StatusActivity extends android.app.TabActivity {
-	private BarnacleApp app;
+    private BarnacleApp app;
 
-	private TabHost tabs;
+    private TabHost tabs;
     private ToggleButton onoff;
     private Button announce;
     private TextView logview;
@@ -60,9 +60,9 @@ public class StatusActivity extends android.app.TabActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         app = (BarnacleApp)getApplication();
-        
+
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setProgressBarIndeterminate(true);
         setContentView(R.layout.main);
@@ -84,18 +84,18 @@ public class StatusActivity extends android.app.TabActivity {
                 app.service.assocRequest();
             }
         });
-        
+
         tabs = getTabHost();
         tabs.addTab(tabs.newTabSpec("log")
-        		.setIndicator("log", getResources().getDrawable(R.drawable.ic_tab_recent))
-        		.setContent(R.id.logview));
+                .setIndicator("log", getResources().getDrawable(R.drawable.ic_tab_recent))
+                .setContent(R.id.logview));
         tabs.addTab(tabs.newTabSpec("traffic")
-        		.setIndicator("traffic", getResources().getDrawable(R.drawable.ic_tab_starred))
-        		.setContent(R.id.traffic));
+                .setIndicator("traffic", getResources().getDrawable(R.drawable.ic_tab_starred))
+                .setContent(R.id.traffic));
         tabs.addTab(tabs.newTabSpec("clients")
                 .setIndicator("clients", getResources().getDrawable(R.drawable.ic_tab_contacts))
                 .setContent(new Intent(this, ClientsActivity.class)));
-        
+
         logview = (TextView) findViewById(R.id.log_text);
         app.setStatusActivity(this);
         paused = false;
@@ -128,7 +128,7 @@ public class StatusActivity extends android.app.TabActivity {
     protected Dialog onCreateDialog(int id) {
         if (id == DLG_ABOUT) {
             return (new AlertDialog.Builder(this))
-            	.setIcon(android.R.drawable.ic_dialog_info)
+                .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("Help")
                 .setMessage("Barnacle was developed by szym.net. Donations are welcome."
                             +"\n\n"
@@ -153,7 +153,7 @@ public class StatusActivity extends android.app.TabActivity {
         }
         if (id == DLG_ROOT) {
             return (new AlertDialog.Builder(this))
-            	.setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Root Access")
                 .setMessage("Barnacle requires 'su' to access the hardware! Please, make sure you have root access.")
                 .setPositiveButton("Help", new DialogInterface.OnClickListener() {
@@ -169,7 +169,7 @@ public class StatusActivity extends android.app.TabActivity {
         }
         if (id == DLG_ERROR) {
             return (new AlertDialog.Builder(this))
-            	.setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Error")
                 .setMessage("Unexpected error occured! Inspect the log and try the troubleshooting guide.")
                 .setPositiveButton("Help", new DialogInterface.OnClickListener() {
@@ -203,13 +203,13 @@ public class StatusActivity extends android.app.TabActivity {
         if (app.service != null && !app.service.isRunning())
         	app.serviceStopped(); // clean up notifications
     }
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		if (BarnacleApp.ACTION_CLIENTS.equals(intent.getAction())) {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (BarnacleApp.ACTION_CLIENTS.equals(intent.getAction())) {
             getTabHost().setCurrentTab(2); // show clients
         }
-	}
+    }
 
     static String format(long v) {
         if (v < 1000000) return nf.format(v /    1000.0f) + " kB";
