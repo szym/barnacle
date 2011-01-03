@@ -28,8 +28,10 @@
 
 #include <ifctl.hh>
 
-// TODO: support 40 bits
-const int WepSize = 13; // 104 bits
+const int WepSize104 = 104/8;
+const int WepSize40 = 40/8;
+// inp = hex string
+template <int WepSize>
 static inline bool wep_parse(const char *inp, uint8_t *var) {
   if (strlen(inp) != 2*WepSize)
     return false;
@@ -47,17 +49,18 @@ static inline int chan2freq(int chan) {
   return 2407 + chan * 5; // MHz
 }
 
+#ifdef BRNCL_TIWLAN_HACK
 namespace TIWLAN {
   const unsigned PRIVATE_CMD_SET_FLAG = 0x00000001;
   const unsigned PRIVATE_CMD_GET_FLAG = 0x00000002;
 
   struct ti_private_cmd {
-    uint32_t   cmd;        // parameter name
-    uint32_t   flags;      // command action type (PRIVATE_CMD_SET_FLAG | PRIVATE_CMD_GET_FLAG)
-    void*     in_buffer;    // Pointer to Input Buffer
-    uint32_t in_buffer_len;
-    void*     out_buffer;   // Pointer to Output buffer
-    uint32_t out_buffer_len;
+    uint32_t   cmd;          // parameter name
+    uint32_t   flags;        // command action type (PRIVATE_CMD_SET_FLAG | PRIVATE_CMD_GET_FLAG)
+    void*      in_buffer;    // Pointer to Input Buffer
+    uint32_t   in_buffer_len;
+    void*      out_buffer;   // Pointer to Output buffer
+    uint32_t   out_buffer_len;
   };
 
 
@@ -101,7 +104,7 @@ namespace TIWLAN {
     return private_get(sock, iwr, RSN_ENCRYPTION_STATUS_PARAM, v);
   }
 };
-
+#endif // BRNCL_TIWLAN_HACK
 
 /**
  * combines ifconfig and iwconfig
@@ -131,7 +134,7 @@ public:
   bool setMode(int mode = IW_MODE_ADHOC) {
     _iwr.u.mode = mode;
     if (ioctl(_sock, SIOCSIWMODE, &_iwr)) {
-      fail("Could not set ad-hoc mode of %s: %s\n");
+      fail("Could not set ad-hoc mode");
       return false;
     }
     return true;
@@ -146,7 +149,7 @@ public:
     _iwr.u.ap_addr.sa_family = ARPHRD_ETHER;
     memcpy(_iwr.u.ap_addr.sa_data, bssid, ETHER_ADDR_LEN);
     if (ioctl(_sock, SIOCSIWAP, &_iwr)) {
-      fail("Could not set bssid of %s: %s\n");
+      fail("Could not set bssid");
       return false;
     }
     return true;
@@ -163,7 +166,7 @@ public:
     _iwr.u.essid.length = len;
     _iwr.u.essid.pointer = (caddr_t) essid;
     if (ioctl(_sock, SIOCSIWESSID, &_iwr)) {
-      fail("Could not set ssid of %s: %s\n");
+      fail("Could not set ssid");
       return false;
     }
     return true;
@@ -186,12 +189,12 @@ public:
     return true;
   }
 
-  bool setWepKey(int idx, uint8_t *key) {
+  bool setWepKey(int idx, uint8_t *key, int len) {
     _iwr.u.encoding.flags = (idx + 1) & IW_ENCODE_INDEX;
     if (key) {
       _iwr.u.encoding.flags |= IW_ENCODE_OPEN;
       _iwr.u.encoding.pointer = (caddr_t) key;
-      _iwr.u.encoding.length = WepSize;
+      _iwr.u.encoding.length = len;
     } else {
       _iwr.u.encoding.flags |= IW_ENCODE_DISABLED;
       _iwr.u.encoding.pointer = (caddr_t) NULL;
@@ -222,7 +225,7 @@ public:
     setAuthParam(IW_AUTH_WPA_VERSION, IW_AUTH_WPA_VERSION_DISABLED);
     setAuthParam(IW_AUTH_WPA_ENABLED, false);
     if (!setAuthParam(IW_AUTH_KEY_MGMT, 0)) {
-      fail("Could not set KEY_MGMT to NONE on %s: %s\n");
+      fail("Could not set KEY_MGMT to NONE");
       return false;
     }
     setAuthParam(IW_AUTH_PRIVACY_INVOKED, false);
@@ -233,10 +236,22 @@ public:
     return true;
   }
 
-  bool configureWep(uint8_t *key) {
+  bool configureWep(const char *wep) {
+    int len = 0;
+    uint8_t key[WepSize104];
+    if (wep_parse<WepSize104>(wep, key))
+      len = WepSize104;
+    else if (wep_parse<WepSize40>(wep, key))
+      len = WepSize40;
+    else {
+      ERR("Failed to parse WEP\n");
+      return false;
+    }
+
     if ( disableWPA()
-        && setWepKey(0, key)
+        && setWepKey(0, key, len)
         && setWepTx(0) ) {
+#ifdef BRNCL_TIWLAN_HACK
       if ((_iwr.ifr_name[0] == 't') && (_iwr.ifr_name[1] == 'i')) {
         // I think it's a TI device, let's try the priv ioctl:
         DBG("attempting private TI ioctl");
@@ -251,6 +266,7 @@ public:
           }
         }
       }
+#endif // BRNCL_TIWLAN_HACK
       return true;
     }
     return false;

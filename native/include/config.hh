@@ -19,6 +19,8 @@
 #ifndef INCLUDED_CONFIG_HH
 #define INCLUDED_CONFIG_HH
 
+#include <linux/prctl.h> // for prctl
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>

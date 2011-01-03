@@ -1,0 +1,17 @@
+#!/system/bin/sh
+
+set -e
+
+MODULE=/system/lib/modules/bcm4329.ko
+FIRMWARE=/sdcard/fw_bcm4329.bin
+
+load() {
+    ls > /dev/null 2>&1 $FIRMWARE || ( echo >&2 "aria: $FIRMWARE not found!" ; exit )
+    insmod $MODULE firmware_path=$FIRMWARE
+}
+
+unload() {
+    rmmod $MODULE
+}
+
+$1

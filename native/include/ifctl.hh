@@ -47,7 +47,7 @@ protected:
   ifreq _ifr; // ifconfig
 
   void fail(const char *msg) {
-    ERR(msg, _ifr.ifr_name, strerror(errno));
+    ERR("%s of %s: %s\n", msg, _ifr.ifr_name, strerror(errno));
   }
 
 public:
@@ -60,13 +60,13 @@ public:
 
   bool setState(bool up) { // set oper state
     if (ioctl(_sock, SIOCGIFFLAGS, &_ifr)) {
-      fail("Could not get flags of %s: %s\n");
+      fail("Could not get flags");
       return false;
     }
     if (up) _ifr.ifr_flags |= IFF_UP;
     else    _ifr.ifr_flags &= ~IFF_UP;
     if (ioctl(_sock, SIOCSIFFLAGS, &_ifr)) {
-      fail("Could not set flags of %s: %s\n");
+      fail("Could not set flags");
       return false;
     }
     return true;
@@ -79,7 +79,7 @@ public:
     sin->sin_port = 0;
     sin->sin_addr.s_addr = addr;
     if (ioctl(_sock, SIOCSIFADDR, &_ifr)) {
-      fail("Setting address of %s failed: %s\n");
+      fail("Could not set address");
       return false;
     }
     return true;
@@ -91,7 +91,7 @@ public:
     sin->sin_port = 0;
     sin->sin_addr.s_addr = mask;
     if (ioctl(_sock, SIOCSIFNETMASK, &_ifr)) {
-      fail("Setting netmask of %s failed: %s\n");
+      fail("Could not set netmask");
       return false;
     }
     return true;
@@ -100,7 +100,7 @@ public:
   bool setMTU(int mtu) {
     _ifr.ifr_mtu = mtu;
     if (ioctl(_sock, SIOCSIFMTU, &_ifr)) {
-      fail("Could not set MTU of %s: %s\n");
+      fail("Could not set MTU");
       return false;
     }
     return true;
@@ -116,15 +116,15 @@ public:
 
   in_addr_t getAddress() {
     if (ioctl(_sock, SIOCGIFADDR, &_ifr)) {
-      fail("Getting address of %s failed: %s\n");
-      return false;
+      fail("Could not get address");
+      return INADDR_NONE;
     }
     return ((sockaddr_in *)&_ifr.ifr_addr)->sin_addr.s_addr;
   }
 
   in_addr_t getMask() {
     if (ioctl(_sock, SIOCGIFNETMASK, &_ifr)) {
-      fail("Getting netmask of %s failed: %s\n");
+      fail("Could not get netmask");
       return INADDR_NONE;
     }
     return ((sockaddr_in *)&_ifr.ifr_addr)->sin_addr.s_addr;
@@ -132,10 +132,18 @@ public:
 
   int getMTU() {
     if (ioctl(_sock, SIOCGIFMTU, &_ifr)) {
-      fail("Could not get MTU of %s: %s\n");
+      fail("Could not get MTU");
       return -1;
     }
     return _ifr.ifr_mtu;
+  }
+
+  bool getHwAddress(uint8_t *addr) {
+    if (ioctl(_sock, SIOCGIFHWADDR, &_ifr)) {
+      return false;
+    }
+    memcpy(addr, _ifr.ifr_hwaddr.sa_data, 6);
+    return true;
   }
 };
 

@@ -41,16 +41,7 @@ public class MACPreference extends EditTextPreference {
     }
 
     public static boolean validate(String addr) {
-        String[] parts = addr.split(":|-|\\.");
-        if (parts.length != 6) return false;
-        for (String s : parts) {
-            try {
-                Integer.parseInt(s, 16);
-            } catch (NumberFormatException e) { 
-                return false;
-            }
-        }
-        return true;
+        return Util.MACAddress.parse(addr) != null;
     }
     
     @Override

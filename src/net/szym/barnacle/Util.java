@@ -1,61 +1,47 @@
-/*	
- *  This file is part of Barnacle Wifi Tether
- *  Copyright (C) 2010 by Szymon Jakubczak
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+*  This file is part of Barnacle Wifi Tether
+*  Copyright (C) 2010 by Szymon Jakubczak
+*
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package net.szym.barnacle;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
+import java.util.Collection;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
+import android.net.wifi.ScanResult;
 import android.util.Log;
 
 
 public class Util {
-    static abstract class WaitingReceiver extends BroadcastReceiver {
-        private final IntentFilter filter;
-        private boolean live = false;
-        WaitingReceiver(String action) { 
-        	filter = new IntentFilter(action); 
-    	}
-        WaitingReceiver(String[] actions) {
-            filter = new IntentFilter();
-            for (int i = 0; i < actions.length; ++i) 
-            	filter.addAction(actions[i]);
-        }
-        public void register(Context context) {
-            context.registerReceiver(this, filter);
-            live = true;
-        }
-        public void onReceive(Context context, Intent intent) {
-        	if (!live) return;
-            if (run()) {// not yet handled
-              context.unregisterReceiver(this);
-              live = false;
-            }
-            //register(context);
-            // FIXME: I really don't understand "The Life Cycle of Broadcast Receiver"
-        }
-        abstract boolean run(); // return true when intent handled
-    }
-
     static class StyledStringBuilder extends android.text.SpannableStringBuilder {
         public StyledStringBuilder() { super(); }
         private StyledStringBuilder append(Object obj, String s) {
@@ -69,8 +55,33 @@ public class Util {
             return append(new android.text.style.ForegroundColorSpan(color), s);
         }
     }
-    
-	static class TrafficData {
+
+    public static class MACAddress {
+        public final static int LENGTH = 6;
+        public final byte[] value = new byte[LENGTH];
+        public static MACAddress parse(String s) {
+            MACAddress addr = new MACAddress();
+            String[] parts = s.split(":|-|\\.");
+            if (parts.length != LENGTH)
+                return null;
+            try {
+                for (int i = 0; i < LENGTH; ++i) {
+                    addr.value[i] = (byte)Integer.parseInt(parts[i], 16);
+                }
+            } catch (NumberFormatException e) {
+                Log.e(BarnacleApp.TAG, "Unable to parse "+ s, e);
+                return null;
+            }
+            return addr;
+        }
+        public String toString() {
+            byte[] v = value;
+            return String.format("%02x:%02x:%02x:%02x:%02x:%02x",
+                    v[0], v[1], v[2], v[3], v[4], v[5]);
+        }
+    }
+
+    public static class TrafficData {
         long rx_bytes;
         long rx_pkts;
         long tx_bytes;
@@ -92,7 +103,8 @@ public class Util {
             tx_pkts /= val;
         }
     }
-    static class TrafficStats {
+
+    public static class TrafficStats {
         private TrafficData start = new TrafficData();
         TrafficData total = new TrafficData();
         TrafficData rate  = new TrafficData();
@@ -182,6 +194,19 @@ public class Util {
         }
     }
 
+    // in absence of proper api
+    public static String getprop(String key) {
+        Process p = null;
+        try {
+            p = Runtime.getRuntime().exec("getprop " + key);
+            return toReader(p.getInputStream()).readLine();
+        } catch (Exception e) {
+            Log.e(BarnacleApp.TAG, "getprop: " + key, e);
+            if (p != null) p.destroy();
+            return null;
+        }
+    }
+
     public static String asc2hex(String asc) {
         try {
             byte[] bytes = asc.getBytes("US-ASCII");
@@ -206,4 +231,17 @@ public class Util {
             return null;
         }
     }
+
+    public static String toCommaList(String s) {
+        String[] parts = s.split(":|,|;|\\||\\s+");
+        StringBuilder sb = new StringBuilder(s.length());
+        String d = "";
+        for (String p : parts) {
+            sb.append(d);
+            sb.append(p);
+            d = ",";
+        }
+        return sb.toString();
+    }
+
 }

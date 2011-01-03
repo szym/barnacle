@@ -22,8 +22,12 @@
 #include <stdio.h>
 #include <sys/file.h>
 
-#define ERR(...) { fprintf(stderr, __VA_ARGS__); fflush(stderr); }
-#define LOG(...) { flock(1, LOCK_EX); fprintf(stdout, __VA_ARGS__); fflush(stdout); flock(1, LOCK_UN); }
+#ifndef TAG
+#define TAG
+#endif
+
+#define ERR(...) { fprintf(stderr, TAG __VA_ARGS__); fflush(stderr); }
+#define LOG(...) { flock(1, LOCK_EX); fprintf(stdout, TAG __VA_ARGS__); fflush(stdout); flock(1, LOCK_UN); }
 
 #ifdef ANDROID
 extern "C" {
@@ -31,7 +35,7 @@ extern "C" {
 }
 
 #define LOG_LEVEL ANDROID_LOG_DEBUG
-#define DBG(...) __android_log_print(LOG_LEVEL, "barnacle", __VA_ARGS__)
+#define DBG(...) __android_log_print(LOG_LEVEL, "barnacle", TAG __VA_ARGS__)
 #else
 #define DBG LOG
 

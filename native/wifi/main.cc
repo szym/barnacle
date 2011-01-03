@@ -16,24 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define TAG "WIFI: "
 #include <config.hh>
 #include "iwctl.hh"
 #include "wifi.hh"
 
 int config() {
   char  iflan[IFNAMSIZ];
-  char  ifwan[IFNAMSIZ]; // for MTU
-  in_addr_t lan_gw;
-  in_addr_t lan_netmask;
+  in_addr_t lan_gw = inet_addr("192.168.5.1");
+  in_addr_t lan_netmask = inet_addr("255.255.255.0");
 
-  ifwan[0] = 0;
   {
     using namespace Config;
     Param params[] = {
      { "brncl_if_lan",      new String(iflan, IFNAMSIZ),  true },
-     { "brncl_if_wan",      new String(ifwan, IFNAMSIZ),  false },
-     { "brncl_lan_gw",      new IP(lan_gw),               true },
-     { "brncl_lan_netmask", new IP(lan_netmask),          true },
+     { "brncl_lan_gw",      new IP(lan_gw),               false },
+     { "brncl_lan_netmask", new IP(lan_netmask),          false },
      { 0, NULL, false }
     };
     if (!configure(params))
@@ -46,25 +44,18 @@ int config() {
                && ic.setMask(lan_netmask)
                && ic.setState(true));
 
-  if (success && ifwan[0]) {
-    int mtulan = ic.getMTU();
-    int mtuwan = IfCtl(ifwan).getMTU();
-    DBG("MTU wan: %d lan: %d\n", mtuwan, mtulan);
-    if ((mtuwan > 0) && ((mtulan > mtuwan) || (mtulan < 0))) {
-      LOG("Reducing MTU from %d to %d\n", mtulan, mtuwan);
-      ic.setMTU(mtuwan);
-    }
-  }
-
   return success ? 0 : -1;
 }
 
+void cleanup() {
+  Wifi::stop_supplicant();
+}
 
 int assoc_loop () {
   static const size_t BufSize = 64;
 
   char  iflan[IFNAMSIZ];
-  char  essid[BufSize+1];
+  char  essid[BufSize+1] = "barnacle";
   char  bssid[BufSize+1] = { '\0' };
   char  wep[BufSize+1] = { '\0' };
   unsigned channel = 1;
@@ -74,7 +65,7 @@ int assoc_loop () {
     using namespace Config;
     Param params[] = {
      { "brncl_if_lan",      new String(iflan, IFNAMSIZ), true },
-     { "brncl_lan_essid",   new String(essid, BufSize),  true },
+     { "brncl_lan_essid",   new String(essid, BufSize),  false },
      { "brncl_lan_bssid",   new String(bssid, BufSize),false },
      { "brncl_lan_wep",     new String(wep, BufSize),  false },
      { "brncl_lan_channel", new Uint(channel),         false },
@@ -92,33 +83,50 @@ int assoc_loop () {
     ic.setChannel(channel); // ignore return value
 
     if (usewext) {
+      // wireless extensions configuration
+
       if (!ic.setMode()) {
-        ERR("Failed to set ad-hoc mode\n");
+        ;//ERR("Failed to set ad-hoc mode\n");
       }
       if (bssid[0]) {
         uint8_t BSS[6];
         if (ether_parse(bssid, BSS)) {
-          if (!ic.setBssid(BSS))
-            ERR("Failed to set BSSID\n");
+          if (!ic.setBssid(BSS)) {
+            ;//ERR("Failed to set BSSID\n");
+          }
         } else ERR("Failed to parse BSSID\n");
       }
+
       if (wep[0]) {
-        uint8_t WEP[WepSize];
-        if (!wep_parse(wep, WEP))
-          ERR("Failed to parse WEP\n"); // FIXME: accept 40-bit wep too
-        if (!ic.configureWep(WEP))
+        if (!ic.configureWep(wep))
           ERR("Failed to configure WEP\n");
       }
       ic.commit();
+
+      uint8_t eth[6];
+      ic.getHwAddress(eth);
+      LOG("OK %s %02x:%02x:%02x:%02x:%02x:%02x\n", iflan,
+          eth[0], eth[1], eth[2], eth[3], eth[4], eth[5]);
+
       // associate
-      LOG("OK %s\n", iflan);
       do {
+        DBG("WLEXT assoc\n");
         if (!ic.setEssid(essid, strlen(essid)))
           break;
         // wait for line on stdin before attempting again
         fgets(buf, sizeof(buf), stdin);
       } while (!feof(stdin));
+
     } else {
+      // wpa_supplicant configuration
+
+      FILE *f = fopen("wpa.conf", "w");
+      if (f) {
+        fprintf(f, "ctrl_interface=%s\nap_scan=2\n", iflan);
+        fclose(f);
+      }
+
+      atexit(cleanup);
       if (!Wifi::init())
         return -1;
 
@@ -130,8 +138,13 @@ int assoc_loop () {
       // TODO: allow dynamic reconfiguration in the association loop
       if (!Wifi::setup(netid, essid, bssid, wep, chan2freq(channel)))
         return -1;
-      LOG("OK %s\n", iflan);
+
+      uint8_t eth[6];
+      ic.getHwAddress(eth);
+      LOG("OK %s %02x:%02x:%02x:%02x:%02x:%02x\n", iflan,
+          eth[0], eth[1], eth[2], eth[3], eth[4], eth[5]);
       do {
+        DBG("WPASUPP assoc\n");
         if (!Wifi::assoc())
           break;
         // wait for line on stdin before attempting again
@@ -140,12 +153,23 @@ int assoc_loop () {
     }
   }
 
-  // TODO: sigaction SIGINT SIGQUIT SIGTERM shutdown
   Wifi::shutdown();
   return 0;
 }
 
+void die(int) {
+  Wifi::shutdown();
+  ERR("killed\n");
+  exit(1);
+}
+
 int main(int argc, const char * argv[]) {
+  prctl(PR_SET_PDEATHSIG, SIGTERM, 0, 0, 0);
+  struct sigaction act;
+  act.sa_handler = die;
+  sigaction(SIGINT, &act, 0);
+  sigaction(SIGTERM, &act, 0);
+
   if (argc == 2) {
     if (!strcmp(argv[1], "assoc")) {
       return assoc_loop();

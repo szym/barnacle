@@ -16,11 +16,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+#define TAG "DHCP: "
 #include <config.hh>
 #include <ifctl.hh>
 #include "dhcp.hh"
 
+void die(int) {
+  exit(1);
+}
+
 int main(int, const char **) {
+  prctl(PR_SET_PDEATHSIG, SIGTERM, 0, 0, 0);
+  struct sigaction act;
+  act.sa_handler = die;
+  sigaction(SIGTERM, &act, 0);
+
   // configure, then run DHCP, bam!
   DHCP::Config c;
 
@@ -46,11 +57,15 @@ int main(int, const char **) {
 
   IfCtl ic(c.ifname);
   c.gw      = ic.getAddress();
+  if (c.gw == INADDR_NONE)
+      return -3;
+
   c.netmask = ic.getMask();
+  if (c.netmask == INADDR_NONE)
+      return -3;
+
   c.subnet  = c.gw & c.netmask;
 
-  if ((c.gw == INADDR_NONE) || (c.netmask == INADDR_NONE))
-    return -3;
 
   DHCP dhcp(c);
   if (!dhcp.init())
@@ -58,7 +73,7 @@ int main(int, const char **) {
 
   close(0); open("/dev/null", O_RDONLY);
   while(dhcp.run());
-  ERR("DHCP exited: %s\n", strerror(errno));
+  ERR("exited: %s\n", strerror(errno));
   return -1;
 }
 

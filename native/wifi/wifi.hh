@@ -25,6 +25,8 @@
 
 #include <log.hh>
 
+#include "init.hh"
+
 extern "C" {
 #include "hardware_legacy_stub.h"
 }
@@ -36,13 +38,49 @@ namespace Wifi {
       return false;
     }
 
-    LOG("wifi driver loaded\n");
+    LOG("driver loaded\n");
     return true;
   }
 
   bool unload_driver() {
     return wifi_unload_driver() == 0;
   }
+
+  static Init::Service *svc = 0;
+
+  bool start_supplicant() {
+    // we try to start the supplicant by hand in order to swap the .conf file
+    if (!svc)
+      svc = Init::find("wpa_supplicant");
+    if (svc) {
+      DBG("Found service: '%s' socket: '%s'\n", svc->command, svc->socket);
+      // use our config file
+      int cmdlen = strlen(svc->command);
+      char cwd[256];
+      getcwd(cwd, sizeof(cwd));
+      int newcmdlen = cmdlen + strlen(cwd) + 32;
+      char *newcommand = (char *)malloc(newcmdlen); // malloc not new[] because Service free()s
+      snprintf(newcommand, newcmdlen, "%s -c%s/%s", svc->command, cwd, "wpa.conf");
+      svc->command = newcommand;
+      if (svc->start()) {
+        DBG("wpa_supplicant custom-started\n");
+        return true;
+      } else {
+        delete svc;
+        svc = 0;
+      }
+    }
+    // but if not, we use libhardware_legacy
+    return false;// ::wifi_start_supplicant() == 0;
+  }
+
+  void stop_supplicant() {
+    if (svc)
+      svc->stop();
+    else
+      ::wifi_stop_supplicant();
+  }
+
 
   // from core/jni/android_net_wifi_Wifi.cpp
   bool doCommand(const char *cmd, char *replybuf, int replybuflen) {
@@ -79,12 +117,12 @@ namespace Wifi {
   }
 
   void shutdown() {
-    wifi_close_supplicant_connection();
-    wifi_stop_supplicant();
+    ::wifi_close_supplicant_connection();
+    stop_supplicant();
   }
 
   bool init() {
-    if (wifi_start_supplicant() != 0) {
+    if (!start_supplicant()) {
       ERR("Failed to start supplicant: %s\n", strerror(errno));
       return false;
     }
@@ -93,7 +131,7 @@ namespace Wifi {
     // try to connect to supplicant 3 times
     bool connected = false;
     for (int i = 0; i < 3; ++i) {
-      if (wifi_connect_to_supplicant() == 0) {
+      if (::wifi_connect_to_supplicant() == 0) {
         connected = true;
         break;
       }
@@ -157,11 +195,18 @@ namespace Wifi {
     return true;
   }
 
+  static bool firstAttempt = true;
 
   bool assoc() {
     doBoolCommand("DRIVER POWERMODE 1", "OK"); // 0-AUTO, 1-ACTIVE
 
+    if (!firstAttempt)
+      doBoolCommand("SCAN"); // this allows to join an existing IBSS
+
+    firstAttempt = false;
+
     if (doBoolCommand("REASSOCIATE", "OK")) {
+#if 0
       char buf[256];
 
       while(false) { // FIXME: actually process events -- but when do these events stop?
@@ -185,6 +230,7 @@ namespace Wifi {
           return false;
         }
       }
+#endif
       return true;
     }
     ERR("Failed to REASSOCIATE\n");

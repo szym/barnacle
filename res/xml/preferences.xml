@@ -1,84 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<!--
+  This file is part of Barnacle Wifi Tether
+  Copyright (C) 2010 by Szymon Jakubczak
 
-	<PreferenceCategory android:title="Wireless LAN">
-		<EditTextPreference android:title="SSID"
-			android:key="@string/lan_essid" android:defaultValue="barnacle"
-			android:singleLine="true" />
-		<net.szym.barnacle.MACPreference android:title="BSSID (Optional)"
-			android:key="@string/lan_bssid" android:singleLine="true" 
-			android:hint="unique MAC address" />
-        <net.szym.barnacle.WEPPreference android:title="Wireless Encryption" 
-            android:summary="Set WEP key (40-bit or 104-bit)"
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Wireless LAN">
+        <EditTextPreference android:title="SSID (Network Name)"
+            android:key="@string/lan_essid" android:defaultValue="barnacle"
+            android:singleLine="true" />
+        <net.szym.barnacle.MACPreference android:title="BSSID (Optional)"
+            android:key="@string/lan_bssid" android:singleLine="true"
+            android:hint="unique MAC address" />
+        <net.szym.barnacle.WEPPreference android:title="Wireless Encryption"
+            android:summary="Set WEP key"
             android:key="@string/lan_wep" android:defaultValue="" />
-        <CheckBoxPreference android:title="Access Control"
-            android:summary="Restrict NAT to selected MAC addresses"
-            android:key="@string/nat_filter" />
-		<ListPreference android:title="Channel"
-			android:key="@string/lan_channel" android:defaultValue="1"
-			android:entries="@array/channel_names" android:entryValues="@array/channel_values" />
+        <ListPreference android:title="Channel"
+            android:key="@string/lan_channel" android:defaultValue="6"
+            android:entries="@array/channel_names" android:entryValues="@array/channel_values" />
         <ListPreference android:title="Custom Wifi Ad-hoc"
             android:key="@string/lan_script" android:defaultValue=""
             android:entries="@array/script_names" android:entryValues="@array/script_values" />
         <CheckBoxPreference android:title="Skip wpa_supplicant"
             android:summary="Configure wifi directly"
             android:key="@string/lan_wext" />
-	</PreferenceCategory>
+        <CheckBoxPreference android:title="Auto Associate"
+            android:summary="Associate every 5 seconds until a client connects"
+            android:key="lan_autoassoc" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Clients">
+        <CheckBoxPreference android:title="Access Control"
+            android:summary="Restrict NAT to selected MAC addresses"
+            android:key="@string/nat_filter" />
+        <PreferenceScreen android:title="New Client Actions"
+                          android:summary="What to do when a client connects">
+            <CheckBoxPreference android:key="client_notify" android:title="Notify"
+                                android:summary="Show notification in status bar"
+                                android:defaultValue="true"
+                                android:disableDependentsState="false" />
+            <RingtonePreference android:key="client_sound" android:title="Sound"
+                                android:summary="Play a ringtone"
+                                android:ringtoneType="notification"
+                                android:showDefault="true"
+                                android:dependency="client_notify" />
+            <CheckBoxPreference android:key="client_light" android:title="Light"
+                                android:summary="Blink status light"
+                                android:dependency="client_notify" />
+            <CheckBoxPreference android:key="client_allow"
+                                android:title="Allow"
+                                android:defaultValue="false"
+                                android:summary="Grant access to NAT" />
+        </PreferenceScreen>
+        <CheckBoxPreference android:title="Local Mode"
+            android:summary="Don't wait for data connection"
+            android:key="wan_nowait" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Advanced">
+        <PreferenceScreen android:title="DHCP" android:summary="LAN Host Configuration">
+            <net.szym.barnacle.IPPreference android:title="Gateway"
+                android:key="@string/lan_gw" android:defaultValue="192.168.5.1"
+                android:singleLine="true" />
+            <net.szym.barnacle.IPPreference android:title="Netmask"
+                android:key="@string/lan_netmask" android:defaultValue="255.255.255.0"
+                android:singleLine="true" />
+            <EditTextPreference android:title="First Host"
+                android:key="@string/dhcp_firsthost" android:defaultValue="100"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <EditTextPreference android:title="Number of Hosts"
+                android:key="@string/dhcp_numhosts" android:defaultValue="100"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <EditTextPreference android:title="Lease Time (seconds)"
+                android:key="@string/dhcp_leasetime" android:defaultValue="1200"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <net.szym.barnacle.IPPreference android:title="DNS 1 (optional)"
+                android:key="@string/dhcp_dns1" android:singleLine="true" />
+            <net.szym.barnacle.IPPreference android:title="DNS 2 (optional)"
+                android:key="@string/dhcp_dns2" android:singleLine="true" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="NAT" android:summary="Network Address Translation">
+            <EditTextPreference android:title="Preserved Ports"
+                android:key="@string/nat_preserve" android:defaultValue=""
+                android:hint="List with commas or spaces"
+                android:summary="These ports will not be translated and can be used for hole-punching." />
+            <EditTextPreference android:title="First Port"
+                android:key="@string/nat_firstport" android:defaultValue="32000"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <EditTextPreference android:title="Number of Ports"
+                android:key="@string/nat_numports" android:defaultValue="300"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <EditTextPreference android:title="Queue Length"
+                android:key="@string/nat_queue" android:defaultValue="100"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <EditTextPreference android:title="Timeout (seconds)"
+                android:key="@string/nat_timeout" android:defaultValue="30"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <EditTextPreference android:title="Timeout TCP (seconds)"
+                android:key="@string/nat_timeout_tcp" android:defaultValue="90"
+                android:numeric="integer"
+                android:singleLine="true" />
+            <CheckBoxPreference android:title="Debug"
+                android:summary="Enable debugging"
+                android:key="@string/nat_log" />
+        </PreferenceScreen>
+    </PreferenceCategory>
     <PreferenceCategory android:title="Interfaces">
         <EditTextPreference android:title="WAN"
             android:key="@string/if_wan" android:defaultValue=""
+            android:hint="leave empty to autodetect"
             android:singleLine="true" />
         <EditTextPreference android:title="LAN"
             android:key="@string/if_lan" android:defaultValue=""
+            android:hint="leave empty to autodetect"
             android:singleLine="true" />
     </PreferenceCategory>
-	<PreferenceCategory android:title="Advanced">
-		<PreferenceScreen android:title="DHCP" android:summary="LAN Host Configuration">
-	        <net.szym.barnacle.IPPreference android:title="Gateway"
-	            android:key="@string/lan_gw" android:defaultValue="192.168.5.1"
-	            android:singleLine="true" />
-	        <net.szym.barnacle.IPPreference android:title="Netmask"
-	            android:key="@string/lan_netmask" android:defaultValue="255.255.255.0"
-	            android:singleLine="true" />
-			<EditTextPreference android:title="First Host"
-				android:key="@string/dhcp_firsthost" android:defaultValue="100"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<EditTextPreference android:title="Number of Hosts"
-				android:key="@string/dhcp_numhosts" android:defaultValue="100"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<EditTextPreference android:title="Lease Time (seconds)"
-				android:key="@string/dhcp_leasetime" android:defaultValue="1200"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<net.szym.barnacle.IPPreference android:title="DNS 1 (optional)"
-				android:key="@string/dhcp_dns1" android:singleLine="true" />
-			<net.szym.barnacle.IPPreference android:title="DNS 2 (optional)"
-				android:key="@string/dhcp_dns2" android:singleLine="true" />
-		</PreferenceScreen>
-		<PreferenceScreen android:title="NAT" android:summary="Network Address Translation">
-			<EditTextPreference android:title="First Port"
-				android:key="@string/nat_firstport" android:defaultValue="32000"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<EditTextPreference android:title="Number of Ports"
-				android:key="@string/nat_numports" android:defaultValue="300"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<EditTextPreference android:title="Queue Length"
-				android:key="@string/nat_queue" android:defaultValue="100"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<EditTextPreference android:title="Timeout (seconds)"
-				android:key="@string/nat_timeout" android:defaultValue="30"
-				android:numeric="integer"
-				android:singleLine="true" />
-			<EditTextPreference android:title="Timeout TCP (seconds)"
-				android:key="@string/nat_timeout_tcp" android:defaultValue="90"
-				android:numeric="integer"
-				android:singleLine="true" />
-		</PreferenceScreen>
-    </PreferenceCategory>
-
 </PreferenceScreen>

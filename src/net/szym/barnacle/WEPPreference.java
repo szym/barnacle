@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.DialogPreference;
 
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.View;
@@ -108,18 +109,24 @@ public class WEPPreference extends DialogPreference implements
     }
 
     private void setWepType(int type) {
+        Context ctx = getContext();
         if (type != weptype) {
             mPasswordEdit.setText(""); // must reset
             weptype = type;
         }
+        int weplength = 0;
         if (type == WEP_TYPE_HEX) {
             mPasswordEdit.setKeyListener(DigitsKeyListener
                     .getInstance("0123456789abcdefABCDEF"));
-            mPasswordEdit.setHint("10 or 26 hex digits");
+            mPasswordEdit.setHint(ctx.getString(R.string.wepHEXhint));
+            weplength = 26;
         } else {
             mPasswordEdit.setKeyListener(TextKeyListener.getInstance());
-            mPasswordEdit.setHint("5 or 13 characters");
+            mPasswordEdit.setHint(ctx.getString(R.string.wepASChint));
+            weplength = 13;
         }
+        // isn't this retarded?
+        mPasswordEdit.setFilters(new InputFilter[] {new InputFilter.LengthFilter(weplength)});
     }
 
     @Override
@@ -171,15 +178,16 @@ public class WEPPreference extends DialogPreference implements
         }
         String pass = mPasswordEdit.getText().toString();
         int type = mWepTypeSpinner.getSelectedItemPosition();
+        Context ctx = getContext();
         if (type == WEP_TYPE_ASCII) {
             if (pass.length() != 5 && pass.length() != 13) {
-                Toast.makeText(getContext(), "WEP key must have 5 or 13 characters", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, ctx.getString(R.string.wepASC), Toast.LENGTH_LONG).show();
                 return false;
             }
             password = '"' + pass + '"';
         } else {
             if (pass.length() != 10 && pass.length() != 26) {
-                Toast.makeText(getContext(), "WEP key must have 10 or 26 hex digits", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, ctx.getString(R.string.wepHEX), Toast.LENGTH_LONG).show();
                 return false;
             }
             password = pass;

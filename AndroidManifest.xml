@@ -1,25 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  This file is part of Barnacle Wifi Tether
+  Copyright (C) 2010 by Szymon Jakubczak
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="net.szym.barnacle" android:versionCode="21"
-	android:versionName="0.5">
-	<application android:label="@string/app_name" android:icon="@drawable/barnacle_head"
-		android:name="BarnacleApp" android:description="@string/app_name">
-		<activity android:launchMode="singleTask" android:name="StatusActivity">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity android:launchMode="singleTop" android:name="ClientsActivity"></activity>
-		<activity android:launchMode="singleTop" android:name="SettingsActivity"></activity>
-		<service android:label="Barnacle Wifi Tether" android:icon="@drawable/barnacle_head"
-			android:name="BarnacleService">
-		</service>
-	</application>
+    package="net.szym.barnacle" android:versionName="0.6.7 (evo)" android:versionCode="39">
+    <application android:label="@string/app_name" android:icon="@drawable/barnacle_head"
+        android:name="BarnacleApp" android:description="@string/app_name">
+        <activity android:launchMode="singleTask" android:name="StatusActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.VOICE_LAUNCH" />
+            </intent-filter>
+        </activity>
+        <activity android:launchMode="singleTop" android:name="ClientsActivity" />
+        <activity android:launchMode="singleTop" android:name="SettingsActivity" />
+        <service android:label="Barnacle Wifi Tether" android:icon="@drawable/barnacle_head"
+            android:name="BarnacleService" />
+        <receiver android:name="ToggleReceiver" android:permission="net.szym.barnacle.CHANGE_STATE">
+            <intent-filter>
+                <action android:name="net.szym.barnacle.TOGGLE_STATE" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="ToggleReceiver" android:permission="net.szym.barnacle.ACCESS_STATE">
+            <intent-filter>
+                <action android:name="net.szym.barnacle.CHECK_STATE" />
+            </intent-filter>
+        </receiver>
+    </application>
 
-	<uses-sdk android:targetSdkVersion="6" android:minSdkVersion="3" />
+    <uses-sdk android:targetSdkVersion="6" android:minSdkVersion="3" />
 
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
-</manifest> 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <permission android:name="net.szym.barnacle.ACCESS_STATE"
+        android:protectionLevel="normal"
+        android:permissionGroup="android.permission-group.NETWORK"
+        android:label="view Barnacle state"/>
+    <permission android:name="net.szym.barnacle.CHANGE_STATE"
+        android:label="change Barnacle state"
+        android:permissionGroup="android.permission-group.NETWORK"
+        android:protectionLevel="dangerous" />
+</manifest>

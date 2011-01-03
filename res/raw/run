@@ -1,32 +1,26 @@
 #!/system/bin/sh
 # main runner (process manager) for barnacle, root required
 
-# NOTE: we can't trap so don't set -e
-#set -e
+cd ${brncl_path:-.}
 
 # load the driver
 # NOTE: Android's shell is ash and there is no "test" or "["
-: ${brncl_lan_script:=wifi} 
+: ${brncl_lan_script:=wifi}
 chmod 750 ./$brncl_lan_script
 ./$brncl_lan_script load
 
+# necessary hack for HTC phones
+type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
+
 # ifconfig $brncl_if_lan $brncl_lan_gw netmask $brncl_lan_netmask up
-./wifi config 
+./wifi config
 
-./dhcp & pid_dhcp=$!
-./nat & pid_nat=$!
-
-cleanup() {
-    kill $pid_dhcp     2>/dev/null || true
-    kill $pid_nat      2>/dev/null || true
-    rm $brncl_nat_ctrl 2>/dev/null || true
-    ./wifi unload
-}
-
-# NOTE: trap causes SIGSEGV on many phones!
-# trap cleanup SIGINT SIGQUIT SIGABRT SIGKILL SIGTERM EXIT
+./dhcp &
+./nat &
 
 # the association loop
-./wifi assoc || true
-cleanup
+./wifi assoc
+
+# cleanup
+./wifi unload
 

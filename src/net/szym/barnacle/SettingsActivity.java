@@ -33,11 +33,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         R.string.nat_firstport, R.string.nat_numports, R.string.nat_queue, R.string.nat_timeout, R.string.nat_timeout_tcp,
         R.string.lan_script
     };
-    final static int[] checks = { R.string.nat_filter, R.string.lan_wext };
+    final static int[] checks = { R.string.nat_filter, R.string.nat_log, R.string.lan_wext };
 
     private void setSummary(Preference p, CharSequence s) {
         if ((s != null) && (s.length() > 0)) {
-            p.setSummary("Current: " + s);
+            p.setSummary(getString(R.string.current) + s);
         } else {
             p.setSummary(null);
         }
@@ -70,9 +70,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         String key = pref.getKey();
         if (key == null) return true;
 
-        BarnacleService svc = ((BarnacleApp)getApplication()).service;
-        if (svc != null && svc.isRunning()) {
-            Toast.makeText(this, "Restart for changes to take effect", Toast.LENGTH_SHORT).show();
+        if (((BarnacleApp)getApplication()).isRunning()) {
+            Toast.makeText(this, getString(R.string.restartneeded), Toast.LENGTH_SHORT).show();
         }
 
         if (ListPreference.class.isInstance(pref) || EditTextPreference.class.isInstance(pref)) {

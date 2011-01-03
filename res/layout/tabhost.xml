@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  This file is part of Barnacle Wifi Tether
+  Copyright (C) 2010 by Szymon Jakubczak
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/tabhost"
     android:layout_width="fill_parent"
@@ -19,54 +36,54 @@
 
             <TableLayout android:id="@+id/traffic" android:paddingTop="20sp"
                 android:gravity="center"
-			    android:layout_width="fill_parent" android:layout_height="wrap_content"
-			    android:stretchColumns="*" android:shrinkColumns="*">
-			    
-			    <TableRow android:layout_width="fill_parent" >
-			        <TextView android:textColor="#FFFFFFFF"
-			            android:layout_width="fill_parent" android:layout_height="wrap_content"
-			            android:layout_alignParentLeft="true" android:textSize="16sp"
-			            android:text="Download" android:gravity="center"
-			            android:textStyle="bold" />
-			        <TextView android:textColor="#FFFFFFFF"
-			            android:layout_width="fill_parent" android:layout_height="wrap_content"
-			            android:layout_alignParentRight="true" android:textSize="16sp"  
-			            android:text="Upload" android:gravity="center"
-			            android:textStyle="bold" />
-			    </TableRow>
-			    <TableRow android:layout_width="fill_parent">
-			        <TextView android:id="@+id/download" android:textColor="#FFa4c639"
-			            android:layout_width="fill_parent" android:layout_height="wrap_content"
-			            android:layout_alignParentLeft="true"
-			            android:textSize="30sp" android:gravity="center"
-			            android:textStyle="bold" android:text="---"/>
-			        <TextView android:id="@+id/upload" android:textColor="#FFf05414"
-			            android:layout_width="fill_parent" android:layout_height="wrap_content"
-			            android:layout_alignParentRight="true"
-			            android:textSize="30sp" android:gravity="center"
-			            android:textStyle="bold" android:text="---"/>
-			    </TableRow>
-			    <TableRow android:layout_width="fill_parent">
-			        <TextView android:id="@+id/download_rate" android:padding="2dp"
-			            android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
-			            android:layout_height="wrap_content" android:textSize="20sp"
-			            android:gravity="center"
-			            android:textStyle="bold" />
-			        <TextView android:id="@+id/upload_rate" android:padding="2dp"
-			            android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
-			            android:layout_height="wrap_content" android:textSize="20sp"
-			            android:gravity="center"
-			            android:textStyle="bold" />
-			    </TableRow>
-			</TableLayout> 
-            
-            
+                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:stretchColumns="*" android:shrinkColumns="*">
+
+                <TableRow android:layout_width="fill_parent" >
+                    <TextView android:textColor="#FFFFFFFF"
+                        android:layout_width="fill_parent" android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true" android:textSize="16sp"
+                        android:text="Download" android:gravity="center"
+                        android:textStyle="bold" />
+                    <TextView android:textColor="#FFFFFFFF"
+                        android:layout_width="fill_parent" android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true" android:textSize="16sp"
+                        android:text="Upload" android:gravity="center"
+                        android:textStyle="bold" />
+                </TableRow>
+                <TableRow android:layout_width="fill_parent">
+                    <TextView android:id="@+id/download" android:textColor="#FFa4c639"
+                        android:layout_width="fill_parent" android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:textSize="30sp" android:gravity="center"
+                        android:textStyle="bold" android:text="---"/>
+                    <TextView android:id="@+id/upload" android:textColor="#FFf05414"
+                        android:layout_width="fill_parent" android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:textSize="30sp" android:gravity="center"
+                        android:textStyle="bold" android:text="---"/>
+                </TableRow>
+                <TableRow android:layout_width="fill_parent">
+                    <TextView android:id="@+id/download_rate" android:padding="2dp"
+                        android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
+                        android:layout_height="wrap_content" android:textSize="20sp"
+                        android:gravity="center"
+                        android:textStyle="bold" />
+                    <TextView android:id="@+id/upload_rate" android:padding="2dp"
+                        android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
+                        android:layout_height="wrap_content" android:textSize="20sp"
+                        android:gravity="center"
+                        android:textStyle="bold" />
+                </TableRow>
+            </TableLayout>
+
+
             <ScrollView android:id="@+id/logview"
-			    android:layout_width="fill_parent" android:layout_height="wrap_content">
-			    <TextView android:id="@+id/log_text"
-			        android:layout_width="fill_parent" android:layout_height="wrap_content"
-			        android:scrollHorizontally="false" android:gravity="top|left" />
-			</ScrollView>
+                android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <TextView android:id="@+id/log_text"
+                    android:layout_width="fill_parent" android:layout_height="wrap_content"
+                    android:scrollHorizontally="false" android:gravity="top|left" />
+            </ScrollView>
 
         </FrameLayout>
     </LinearLayout>

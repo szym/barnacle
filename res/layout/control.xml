@@ -1,27 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  This file is part of Barnacle Wifi Tether
+  Copyright (C) 2010 by Szymon Jakubczak
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:gravity="top"
-	android:layout_height="fill_parent"
-	android:padding="5sp">
-	<RelativeLayout android:id="@+id/logo" 
-	    android:layout_height="wrap_content" android:layout_width="fill_parent">
-	    <ImageView android:id="@+id/logo_img" android:src="@drawable/barnacle_head"
-	        android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
-		    android:layout_width="wrap_content" android:layout_height="wrap_content" />
-		<TextView android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
-			android:id="@+id/logo_text" android:layout_height="wrap_content"
-			android:layout_centerVertical="true"
-			android:layout_alignParentRight="true" android:layout_alignParentTop="true" 
-			android:layout_toRightOf="@id/logo_img" 
-			android:textSize="25sp" android:gravity="center" android:textStyle="bold"
-			android:typeface="normal" android:text="@string/app_name" />
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:gravity="top"
+    android:layout_height="fill_parent"
+    android:padding="5sp">
+    <RelativeLayout android:id="@+id/logo"
+        android:layout_height="wrap_content" android:layout_width="fill_parent">
+        <ImageView android:id="@+id/logo_img" android:src="@drawable/barnacle_head"
+            android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <TextView android:textColor="#FFFFFFFF" android:layout_width="fill_parent"
+            android:id="@+id/logo_text" android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true" android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/logo_img"
+            android:textSize="25sp" android:gravity="center" android:textStyle="bold"
+            android:typeface="normal" android:text="@string/app_name" />
     </RelativeLayout>
-    <ToggleButton android:id="@+id/onoff" 
-        android:textOff="Start" android:textOn="Stop" 
-        android:textSize="30sp" android:textStyle="bold"
+    <ToggleButton android:id="@+id/onoff"
+        android:textOff="Start" android:textOn="Stop"
+        android:textSize="22dp" android:textStyle="bold"
         android:layout_height="wrap_content" android:layout_width="fill_parent" />
     <Button android:id="@+id/announce" android:text="@string/announce"
-        android:textSize="30sp" 
+        android:textSize="36dp"
         android:layout_height="wrap_content" android:layout_width="fill_parent" />
 </LinearLayout>

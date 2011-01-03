@@ -21,8 +21,6 @@ EOF
     
     echo "hero: Initializing driver..."
     wlan_loader -f /system/etc/wifi/Fw1251r1c.bin -e /proc/calibration -i $INIFILE
-    
-    ip route delete table gprs 2>/dev/null || echo "hero: no gprs table"
 }
 
 unload() { 

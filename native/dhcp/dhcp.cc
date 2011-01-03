@@ -20,6 +20,8 @@
 #include <ctype.h>
 #include <errno.h>
 
+
+#define TAG "DHCP: "
 #include <log.hh>
 #include "dhcp.hh"
 
@@ -157,7 +159,7 @@ void DHCP::parse_req(int &msg_type, in_addr_t &requested_ip, char * &hostname) {
       else hostname = NULL; // to prevent buffer overrun
     }
   } else {
-    DBG("DHCP no magic cookie\n");
+    DBG("no magic cookie\n");
     // BOOTP fallback
     requested_ip = _req.ciaddr ? _req.ciaddr : _req.yiaddr;
     msg_type = requested_ip ? DHCPREQUEST : DHCPDISCOVER;
@@ -179,7 +181,7 @@ dhcp_packet * DHCP::handle_discover() {
     r = &_resp;
     r->yiaddr = idx2addr(idx);
     SET_MSG(r, DHCPOFFER);
-    DBG(">>> DHCP offered %d\n", idx);
+    DBG("offered %d\n", idx);
     ++_last_offer;
     if (_last_offer > _cfg.numhosts) _last_offer = 0;
   } else LOG("OUT OF IP ADDRESSES!\n");
@@ -196,10 +198,10 @@ dhcp_packet * DHCP::handle_request(in_addr_t requested_ip, char *hostname) {
   if ((idx >= 0)
       && ((_leases[idx].expiry < now) || _leases[idx].ownedby(_req.chaddr))) {
     const uint8_t *p = (const uint8_t *)&requested_ip;
-    DBG("DHCPACK %d.%d.%d.%d\n", p[0],p[1],p[2],p[3]);
+    DBG("ACK %d.%d.%d.%d\n", p[0],p[1],p[2],p[3]);
     const uint8_t *e = (const uint8_t *)_req.chaddr;
     // NOTE: assume hlen = 6
-    LOG("DHCPACK %02x:%02x:%02x:%02x:%02x:%02x %d.%d.%d.%d %s\n",
+    LOG("ACK %02x:%02x:%02x:%02x:%02x:%02x %d.%d.%d.%d %s\n",
       e[0],e[1],e[2],e[3],e[4],e[5], p[0],p[1],p[2],p[3], hostname ? make_printable(hostname) : "");
     fflush(stdout);
     // setup the new lease
@@ -211,7 +213,7 @@ dhcp_packet * DHCP::handle_request(in_addr_t requested_ip, char *hostname) {
     r->yiaddr = requested_ip;
     SET_MSG(r, DHCPACK);
   } else {
-    DBG("DHCNAK %d\n", idx);
+    DBG("NAK %d\n", idx);
     r = &_resp_nak;
   }
   return r;
@@ -222,15 +224,15 @@ bool DHCP::run() {
   ::memset(&_req, 0, sizeof(_req));
   int len = ::recv(_sock, &_req, sizeof(_req), MSG_TRUNC); // note, no timeout
   if (len < 0) {
-    ERR("DHCP recv failed: %s\n", strerror(errno));
+    ERR("recv failed: %s\n", strerror(errno));
     return false;
   }
   if (len < DHCP_MIN_SIZE) {
-    DBG("DHCP packet too short %d bytes < %d\n", len, DHCP_MIN_SIZE);
+    DBG("packet too short %d bytes < %d\n", len, DHCP_MIN_SIZE);
     return true; // ignore it
   }
   if (_req.op != BOOTREQUEST) {
-    DBG("DHCP not a BOOTREQUEST: %d\n", _req.op);
+    DBG("not a BOOTREQUEST: %d\n", _req.op);
     return true; // ignore it
   }
 
@@ -249,10 +251,10 @@ bool DHCP::run() {
     if (idx >= 0) {
       // check if it owns the address
       if (_leases[idx].ownedby(_req.chaddr)) {
-        DBG("DHCPRELEASE %d\n", idx);
+        DBG("RELEASE %d\n", idx);
         _leases[idx].expiry = 0;
       }
-    } else DBG("DHCPRELEASE INVALID\n");
+    } else DBG("RELEASE INVALID\n");
   } break;
 
   case DHCPDISCOVER: { // client locates servers
@@ -264,7 +266,7 @@ bool DHCP::run() {
   } break;
 
   case DHCPDECLINE: { // client claims the IP is in use
-    DBG("DHCPDECLINE %d\n", requested_ip);
+    DBG("DECLINE %d\n", requested_ip);
     int idx = addr2idx(requested_ip);
     if (idx >= 0) {
       _leases[idx].expiry = time(0) + _cfg.leasetime / 2;
@@ -277,7 +279,7 @@ bool DHCP::run() {
     break;
 
   default:
-    DBG("DHCP unknown message type: %d\n", msg_type);
+    DBG("unknown message type: %d\n", msg_type);
     break;
 
   }
@@ -300,7 +302,7 @@ bool DHCP::run() {
   }
   len = ::sendto(_sock, r, sizeof(dhcp_packet), 0, (sockaddr *)&sa, sizeof(sa));
   if (len <= 0) {
-    ERR("DHCP send failed: %s\n", strerror(errno));
+    ERR("send failed: %s\n", strerror(errno));
     return false;
   }
   return true;
