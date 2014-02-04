@@ -15,6 +15,9 @@ type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
 # ifconfig $brncl_if_lan $brncl_lan_gw netmask $brncl_lan_netmask up
 ./wifi config
 
+# Xperia X10 running Gingerbread needs extra time for wifi config to finish
+sleep 1
+
 ./dhcp &
 ./nat &
 
